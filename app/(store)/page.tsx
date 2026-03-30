@@ -30,10 +30,10 @@ export default async function StorePage() {
   }))
 
   return (
-    <>
+    <main className="pointer-events-auto">
       <HeroSection />
       <ProductsSection products={products} />
-    </>
+    </main>
   )
 }
 
@@ -43,10 +43,10 @@ export default async function StorePage() {
 
 function HeroSection() {
   return (
-    <section className="flex flex-col lg:flex-row lg:min-h-screen">
+    <section className="flex flex-col lg:flex-row">
       {/* Image area — RIGHT in RTL (55%) */}
       <div
-        className="relative h-[56vw] lg:h-auto lg:w-[55%] bg-brand overflow-hidden"
+        className="relative h-[56vw] lg:h-[85vh] lg:w-[55%] bg-brand overflow-hidden"
         style={{
           backgroundImage: `repeating-linear-gradient(
             -45deg,
@@ -71,7 +71,7 @@ function HeroSection() {
       </div>
 
       {/* Content area — LEFT in RTL (45%) */}
-      <div className="lg:w-[45%] bg-surface flex flex-col justify-center px-8 lg:px-16 py-12 lg:py-0">
+      <div className="lg:w-[45%] lg:h-[85vh] bg-surface flex flex-col justify-center px-8 lg:px-16 py-12 lg:py-0">
         <div className="flex flex-col items-center lg:items-start text-center lg:text-start">
           {/* Decorative accent line */}
           <div className="w-16 h-0.5 bg-accent mb-4" />
@@ -102,7 +102,7 @@ function HeroSection() {
 
 function ProductsSection({ products }: { products: Product[] }) {
   return (
-    <section id="products" className="max-w-7xl mx-auto px-4 sm:px-6 py-16 lg:py-20">
+    <section id="products" className="relative z-10 pointer-events-auto max-w-7xl mx-auto px-4 sm:px-6 py-16 lg:py-20">
       <div className="mb-10">
         <h2 className="font-heading font-black text-3xl text-brand mb-2">التشكيلة</h2>
         <p className="text-muted font-body text-sm">

@@ -3,6 +3,7 @@
 import { X } from 'lucide-react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useEffect } from 'react'
+import { useLockScroll } from '@/lib/use-lock-scroll'
 
 interface ModalProps {
   isOpen: boolean
@@ -21,11 +22,7 @@ export default function Modal({ isOpen, onClose, title, children }: ModalProps) 
     return () => document.removeEventListener('keydown', handler)
   }, [onClose])
 
-  // Lock body scroll when open
-  useEffect(() => {
-    document.body.style.overflow = isOpen ? 'hidden' : ''
-    return () => { document.body.style.overflow = '' }
-  }, [isOpen])
+  useLockScroll(isOpen)
 
   return (
     <AnimatePresence>

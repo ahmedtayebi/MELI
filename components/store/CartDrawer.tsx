@@ -1,6 +1,7 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
+import { useLockScroll } from '@/lib/use-lock-scroll'
 import Image from 'next/image'
 import { X, ShoppingBag, Minus, Plus, Trash2 } from 'lucide-react'
 import { AnimatePresence, motion } from 'framer-motion'
@@ -24,13 +25,7 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
   const clearCart = useCartStore((state) => state.clearCart)
   const itemCount = items.reduce((sum, i) => sum + i.quantity, 0)
 
-  // Lock body scroll while drawer is open
-  useEffect(() => {
-    document.body.style.overflow = isOpen ? 'hidden' : ''
-    return () => {
-      document.body.style.overflow = ''
-    }
-  }, [isOpen])
+  useLockScroll(isOpen)
 
   const handleOrderSuccess = () => {
     clearCart()
@@ -53,19 +48,13 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
               onClick={onClose}
             />
 
-            {/* Drawer panel — slides in from physical left, swipe-left to close */}
+            {/* Drawer panel — slides in from physical left */}
             <motion.div
               className="fixed inset-y-0 left-0 w-full max-w-sm bg-white z-40 flex flex-col shadow-2xl"
               initial={{ x: '-100%' }}
               animate={{ x: 0 }}
               exit={{ x: '-100%' }}
               transition={{ type: 'tween', duration: 0.3, ease: 'easeInOut' }}
-              drag="x"
-              dragConstraints={{ left: 0, right: 0 }}
-              dragElastic={{ left: 0.3, right: 0 }}
-              onDragEnd={(_, info) => {
-                if (info.offset.x < -60) onClose()
-              }}
             >
               {/* ── Header ── */}
               <div className="flex items-center justify-between px-4 py-4 border-b border-border flex-shrink-0">

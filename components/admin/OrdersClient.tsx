@@ -41,6 +41,7 @@ export default function OrdersClient({ initialOrders }: Props) {
     pending:   orders.filter(o => o.status === 'pending').length,
     confirmed: orders.filter(o => o.status === 'confirmed').length,
     delivered: orders.filter(o => o.status === 'delivered').length,
+    cancelled: orders.filter(o => o.status === 'cancelled').length,
   }), [orders])
 
   // ── Filtered + searched + paginated ───────────────────────
@@ -93,19 +94,19 @@ export default function OrdersClient({ initialOrders }: Props) {
       {/* Stats row */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         {[
-          { key: 'all' as FilterType, label: 'الكل', count: stats.all },
-          { key: 'pending' as FilterType, label: 'قيد الانتظار', count: stats.pending },
-          { key: 'confirmed' as FilterType, label: 'مؤكدة', count: stats.confirmed },
-          { key: 'delivered' as FilterType, label: 'مُسلَّمة', count: stats.delivered },
+          { key: 'pending' as FilterType,   label: 'قيد الانتظار', count: stats.pending },
+          { key: 'confirmed' as FilterType, label: 'مؤكدة',        count: stats.confirmed },
+          { key: 'delivered' as FilterType, label: 'مُسلَّمة',     count: stats.delivered },
+          { key: 'cancelled' as FilterType, label: 'ملغاة',        count: stats.cancelled },
         ].map(({ key, label, count }) => (
           <button
             key={key}
             onClick={() => handleFilter(key)}
             className={cn(
-              'bg-white rounded-xl border p-4 text-right transition-all',
+              'rounded-xl border-2 p-4 text-right transition-all',
               filter === key
-                ? 'border-accent bg-accent text-white shadow-sm'
-                : 'border-border hover:border-brand'
+                ? 'bg-accent border-accent shadow-sm'
+                : 'bg-white border-border hover:border-brand'
             )}
           >
             <p className={cn('font-heading font-black text-2xl', filter === key ? 'text-white' : 'text-brand')}>
