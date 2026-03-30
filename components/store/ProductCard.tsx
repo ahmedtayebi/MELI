@@ -4,29 +4,23 @@ import { useState } from 'react'
 import { useCartStore } from '@/lib/cart-store'
 import type { Product } from '@/lib/types'
 
-interface ProductCardProps {
-  product: Product
-}
-
-export default function ProductCard({ product }: ProductCardProps) {
+export default function ProductCard({ product }: { product: Product }) {
   const visibleColors = product.product_colors?.filter(c => c.is_visible) ?? []
-  const visibleSizes = product.product_sizes?.filter(s => s.is_visible) ?? []
+  const visibleSizes = product.product_sizes
+    ?.filter(s => s.is_visible)
+    .filter((s, i, arr) => arr.findIndex(t => t.label === s.label) === i) ?? []
 
-  const [selectedColorId, setSelectedColorId] = useState<string>(
-    visibleColors[0]?.id ?? ''
-  )
-  const [selectedSizeId, setSelectedSizeId] = useState<string>('')
+  const [selectedColorId, setSelectedColorId] = useState(visibleColors[0]?.id ?? '')
+  const [selectedSizeId, setSelectedSizeId] = useState('')
   const [added, setAdded] = useState(false)
 
-  const addItem = useCartStore((state) => state.addItem)
-
+  const addItem = useCartStore((s) => s.addItem)
   const selectedColor = visibleColors.find(c => c.id === selectedColorId) ?? visibleColors[0]
 
-  const handleAddToCart = () => {
+  const handleAdd = () => {
     if (!selectedSizeId || !selectedColor) return
-    const selectedSize = visibleSizes.find(s => s.id === selectedSizeId)
-    if (!selectedSize) return
-
+    const size = visibleSizes.find(s => s.id === selectedSizeId)
+    if (!size) return
     addItem({
       product_id: product.id,
       product_name: product.name,
@@ -34,20 +28,21 @@ export default function ProductCard({ product }: ProductCardProps) {
       color_name: selectedColor.name,
       color_hex: selectedColor.hex_code,
       color_image_url: selectedColor.image_url,
-      size_id: selectedSize.id,
-      size_label: selectedSize.label,
+      size_id: size.id,
+      size_label: size.label,
       quantity: 1,
     })
-
     setAdded(true)
     setTimeout(() => setAdded(false), 1500)
   }
 
   return (
-    <div className="bg-white rounded-2xl overflow-hidden border border-border hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+    <div className="bg-white rounded-2xl border border-border overflow-hidden
+                    flex flex-row-reverse h-48 shadow-sm
+                    hover:shadow-md transition-shadow duration-200">
 
-      {/* IMAGE */}
-      <div className="aspect-[3/4] relative overflow-hidden bg-surface">
+      {/* RIGHT — Image (RTL: right side) */}
+      <div className="w-[42%] shrink-0 relative bg-surface overflow-hidden">
         {selectedColor?.image_url ? (
           <img
             src={selectedColor.image_url}
@@ -56,56 +51,50 @@ export default function ProductCard({ product }: ProductCardProps) {
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center bg-gradient-to-b from-surface to-border">
-            <span className="font-heading font-black text-4xl text-border">
+            <span className="font-heading font-black text-5xl text-border/60">
               {product.name.charAt(0)}
             </span>
           </div>
         )}
       </div>
 
-      {/* BODY */}
-      <div className="px-4 pt-3 pb-4 flex flex-col gap-3">
+      {/* LEFT — Content */}
+      <div className="flex-1 flex flex-col justify-between p-3 overflow-hidden">
 
-        {/* NAME */}
-        <p className="font-heading font-black text-lg text-brand text-right truncate">
-          {product.name}
-        </p>
-
-        {/* COLORS */}
+        {/* TOP: name + colors + sizes */}
         <div>
-          <p className="text-xs font-bold text-muted text-right mb-1">اللون</p>
-          {selectedColor && (
-            <p className="text-sm font-heading font-bold text-brand text-right mb-2">
-              {selectedColor.name}
-            </p>
-          )}
-          {visibleColors.length > 0 ? (
-            <div className="flex flex-row-reverse gap-2 flex-wrap">
-              {visibleColors.map((color) => (
+          <p className="font-heading font-black text-base text-brand text-right leading-tight line-clamp-2 mb-2">
+            {product.name}
+          </p>
+
+          {/* Color swatches */}
+          {visibleColors.length > 0 && (
+            <div className="flex flex-row-reverse gap-1.5 mb-2">
+              {visibleColors.slice(0, 5).map((color) => (
                 <button
                   key={color.id}
                   type="button"
                   onClick={() => setSelectedColorId(color.id)}
                   className={[
-                    'w-7 h-7 rounded-full border-2 transition-all duration-200 cursor-pointer',
+                    'w-5 h-5 rounded-full border-2 transition-all duration-200',
                     selectedColorId === color.id
                       ? 'border-brand scale-110 shadow-sm'
-                      : 'border-transparent hover:border-muted'
+                      : 'border-transparent hover:border-muted',
                   ].join(' ')}
                   style={{ backgroundColor: color.hex_code }}
                   title={color.name}
                 />
               ))}
+              {visibleColors.length > 5 && (
+                <span className="text-[10px] text-muted self-center">
+                  +{visibleColors.length - 5}
+                </span>
+              )}
             </div>
-          ) : (
-            <p className="text-xs text-muted text-right">لا يوجد</p>
           )}
-        </div>
 
-        {/* SIZES */}
-        <div>
-          <p className="text-xs font-bold text-muted text-right mb-1">المقاس</p>
-          {visibleSizes.length > 0 ? (
+          {/* Size pills */}
+          {visibleSizes.length > 0 && (
             <div className="flex flex-row-reverse flex-wrap gap-1">
               {visibleSizes.map((size) => (
                 <button
@@ -113,42 +102,43 @@ export default function ProductCard({ product }: ProductCardProps) {
                   type="button"
                   onClick={() => setSelectedSizeId(size.id)}
                   className={[
-                    'rounded-full px-3 py-1 text-xs font-heading font-bold transition-all duration-200 cursor-pointer',
+                    'rounded-full px-2 py-0.5 text-[11px] font-heading font-bold',
+                    'transition-all duration-200 border',
                     selectedSizeId === size.id
-                      ? 'bg-brand text-white'
-                      : 'border border-border text-muted hover:border-brand hover:text-brand'
+                      ? 'bg-brand text-white border-brand'
+                      : 'border-border text-muted hover:border-brand hover:text-brand',
                   ].join(' ')}
                 >
                   {size.label}
                 </button>
               ))}
             </div>
-          ) : (
-            <p className="text-xs text-muted text-right">لا يوجد</p>
           )}
         </div>
 
-        {/* PRICE */}
-        <p className="font-heading font-black text-xl text-accent text-right">
-          {product.price.toLocaleString('ar-DZ')} دج
-        </p>
+        {/* BOTTOM: price + button */}
+        <div className="flex flex-row-reverse items-center justify-between gap-2 mt-2">
+          <p className="font-heading font-black text-base text-accent whitespace-nowrap">
+            {product.price.toLocaleString('ar-DZ')} دج
+          </p>
 
-        {/* ADD TO CART */}
-        <button
-          type="button"
-          onClick={handleAddToCart}
-          disabled={!selectedSizeId || added}
-          className={[
-            'w-full h-12 rounded-xl font-heading font-bold text-base transition-all duration-200 cursor-pointer',
-            added
-              ? 'bg-green-600 text-white'
-              : selectedSizeId
-                ? 'bg-brand text-white hover:bg-accent'
-                : 'bg-muted/20 text-muted cursor-not-allowed'
-          ].join(' ')}
-        >
-          {added ? '✓ تمت الإضافة' : selectedSizeId ? 'إضافة للسلة' : 'اختاري المقاس أولاً'}
-        </button>
+          <button
+            type="button"
+            onClick={handleAdd}
+            disabled={!selectedSizeId || added}
+            className={[
+              'rounded-xl px-3 h-9 text-xs font-heading font-bold',
+              'transition-all duration-200 whitespace-nowrap',
+              added
+                ? 'bg-green-600 text-white'
+                : selectedSizeId
+                  ? 'bg-brand text-white hover:bg-accent'
+                  : 'bg-muted/15 text-muted cursor-not-allowed',
+            ].join(' ')}
+          >
+            {added ? '✓ تمت' : selectedSizeId ? 'أضيفي للسلة' : 'اختاري المقاس'}
+          </button>
+        </div>
 
       </div>
     </div>

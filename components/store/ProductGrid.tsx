@@ -1,13 +1,11 @@
+'use client'
+
 import { Package } from 'lucide-react'
 import { EmptyState } from '@/components/ui'
 import ProductCard from './ProductCard'
 import type { Product } from '@/lib/types'
 
-interface ProductGridProps {
-  products: Product[]
-}
-
-export default function ProductGrid({ products }: ProductGridProps) {
+export default function ProductGrid({ products }: { products: Product[] }) {
   if (products.length === 0) {
     return (
       <EmptyState
@@ -19,10 +17,20 @@ export default function ProductGrid({ products }: ProductGridProps) {
   }
 
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-3 gap-5">
-      {products.map((product) => (
-        <ProductCard key={product.id} product={product} />
-      ))}
-    </div>
+    <>
+      {/* Mobile: single column horizontal cards */}
+      <div className="flex flex-col gap-4 lg:hidden">
+        {products.map((product) => (
+          <ProductCard key={product.id} product={product} />
+        ))}
+      </div>
+
+      {/* Desktop: 3-column grid */}
+      <div className="hidden lg:grid lg:grid-cols-3 gap-6">
+        {products.map((product) => (
+          <ProductCard key={product.id} product={product} />
+        ))}
+      </div>
+    </>
   )
 }

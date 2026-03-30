@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import React, { useState, useMemo } from 'react'
 import { Search, ChevronDown, ChevronUp } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils'
@@ -165,8 +165,8 @@ export default function OrdersClient({ initialOrders }: Props) {
                 </td>
               </tr>
             ) : paginated.map((order) => (
-              <>
-                <tr key={order.id} className="hover:bg-surface/50 transition-colors">
+              <React.Fragment key={order.id}>
+                <tr className="hover:bg-surface/50 transition-colors">
                   <td className="px-4 py-3 font-body text-xs text-muted tabular-nums">
                     #{order.id.slice(-6).toUpperCase()}
                   </td>
@@ -256,7 +256,7 @@ export default function OrdersClient({ initialOrders }: Props) {
                     </td>
                   </tr>
                 )}
-              </>
+              </React.Fragment>
             ))}
           </tbody>
         </table>
