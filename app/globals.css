@@ -4,7 +4,7 @@
   /* Colors */
   --color-brand: #1a1a1a;
   --color-accent: #8B1A2E;
-  --color-surface: #FAFAF8;
+  --color-surface: #F5EDD9;
   --color-muted: #6B6B6B;
   --color-border: #E8E4DF;
   --color-white: #FFFFFF;
@@ -27,7 +27,7 @@ html {
 }
 
 body {
-  background: #FAFAF8;
+  background: #5f4a16;
   margin: 0;
   padding: 0;
 }

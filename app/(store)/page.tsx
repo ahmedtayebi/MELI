@@ -33,7 +33,52 @@ export default async function StorePage() {
     <main className="pointer-events-auto">
       <HeroSection />
       <ProductsSection products={products} />
+      <StatementSection />
+
     </main>
+  )
+}
+
+// ─────────────────────────────────────────────────────────
+// Statement
+// ─────────────────────────────────────────────────────────
+
+function StatementSection() {
+  return (
+    <section id="statement" className="bg-brand py-24 px-6 text-center">
+      <div className="max-w-2xl mx-auto flex flex-col items-center gap-8">
+
+        <h2 className="font-heading font-black text-4xl sm:text-5xl text-white leading-tight">
+          نحن لا نبيع عباءة
+          <br />
+          نبيع <span className="text-accent">ثقتكِ</span> بنفسك
+        </h2>
+
+        <div className="w-16 h-0.5 bg-accent" />
+
+        <p className="font-body text-white/60 text-lg italic leading-relaxed max-w-md">
+          كل عباءة مصممة بعناية لتعكس أناقتك اليومية وتمنحكِ الراحة طوال اليوم
+        </p>
+
+        <div className="grid grid-cols-3 gap-6 w-full mt-4">
+          {[
+            { number: '100%', label: 'جودة مضمونة' },
+            { number: 'يومي', label: 'توصيل لكل الولايات' },
+            { number: '24/7', label: 'خدمة العملاء' },
+          ].map(({ number, label }) => (
+            <div key={label} className="flex flex-col items-center gap-2">
+              <span className="font-heading font-black text-2xl sm:text-3xl text-accent">
+                {number}
+              </span>
+              <span className="font-body text-white/50 text-xs sm:text-sm text-center">
+                {label}
+              </span>
+            </div>
+          ))}
+        </div>
+
+      </div>
+    </section>
   )
 }
 
@@ -71,7 +116,7 @@ function HeroSection() {
       </div>
 
       {/* Content area — LEFT in RTL (45%) */}
-      <div className="lg:w-[45%] lg:h-[85vh] bg-surface flex flex-col justify-center px-8 lg:px-16 py-12 lg:py-0">
+      <div className="lg:w-[45%] lg:h-[85vh] bg-[#fffbf1] flex flex-col justify-center px-8 lg:px-16 py-12 lg:py-0">
         <div className="flex flex-col items-center lg:items-start text-center lg:text-start">
           {/* Decorative accent line */}
           <div className="w-16 h-0.5 bg-accent mb-4" />
@@ -102,14 +147,16 @@ function HeroSection() {
 
 function ProductsSection({ products }: { products: Product[] }) {
   return (
-    <section id="products" className="relative z-10 pointer-events-auto max-w-7xl mx-auto px-4 sm:px-6 py-16 lg:py-20">
-      <div className="mb-10">
-        <h2 className="font-heading font-black text-3xl text-brand mb-2">التشكيلة</h2>
-        <p className="text-muted font-body text-sm">
-          اكتشفي أحدث مجموعاتنا من العبايات الفاخرة
-        </p>
+    <section id="products" className="relative z-10 pointer-events-auto bg-[#FFFDF9] w-full">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-16 lg:py-20">
+        <div className="mb-10">
+          <h2 className="font-heading font-black text-3xl text-brand mb-2">لبسي واش تحبي معانا madame</h2>
+          <p className="text-muted font-body text-sm">
+            اكتشفي أحدث مجموعاتنا من العبايات الفاخرة
+          </p>
+        </div>
+        <ProductGrid products={products} />
       </div>
-      <ProductGrid products={products} />
     </section>
   )
 }
