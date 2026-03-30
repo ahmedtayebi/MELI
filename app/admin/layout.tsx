@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen bg-surface" dir="rtl">
+    <div className="min-h-screen bg-[#fffbf1]" dir="rtl">
       <AdminSidebar />
       {/* mr-64 → clears the right-side sidebar in RTL */}
       <main className="lg:mr-64 min-h-screen p-5 lg:p-8 pb-24 lg:pb-8">
