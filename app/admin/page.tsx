@@ -1,0 +1,17 @@
+import { createClient } from '@/lib/supabase/server'
+import OrdersClient from '@/components/admin/OrdersClient'
+import type { Order } from '@/lib/types'
+
+export default async function AdminOrdersPage() {
+  const supabase = await createClient()
+
+  const { data } = await supabase
+    .from('orders')
+    .select(
+      `id, customer_name, phone, wilaya, status, notes, created_at, updated_at,
+       order_items(id, order_id, product_id, product_name, color_name, color_hex, color_image_url, size_label, quantity)`
+    )
+    .order('created_at', { ascending: false })
+
+  return <OrdersClient initialOrders={(data ?? []) as Order[]} />
+}
