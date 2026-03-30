@@ -27,8 +27,10 @@ export default function Header({ onCartClick }: HeaderProps) {
 
         {/* Cart — left side in RTL (last child) */}
         <button
+          type="button"
           onClick={onCartClick}
-          className="relative p-2 rounded-xl text-brand hover:bg-surface transition-colors duration-200"
+          style={{ WebkitTapHighlightColor: 'transparent' }}
+          className="relative p-3 rounded-xl text-brand transition-colors duration-200 touch-manipulation cursor-pointer"
           aria-label={`عربة التسوق${cartCount > 0 ? ` — ${cartCount} عناصر` : ''}`}
         >
           <ShoppingBag size={22} />

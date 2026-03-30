@@ -1,6 +1,7 @@
 export interface Product {
   id: string
   name: string
+  price: number
   is_visible: boolean
   created_at: string
   updated_at: string

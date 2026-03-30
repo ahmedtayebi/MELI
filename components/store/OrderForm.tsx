@@ -204,7 +204,7 @@ export default function OrderForm({ onSuccess }: OrderFormProps) {
       {/* Field: Full name */}
       <Input
         label="الاسم الكامل"
-        placeholder="مثال: فاطمة بن علي"
+        placeholder="احمد الطيبي"
         value={formData.customer_name}
         onChange={(e) =>
           setFormData((d) => ({ ...d, customer_name: e.target.value }))
@@ -217,7 +217,7 @@ export default function OrderForm({ onSuccess }: OrderFormProps) {
       <Input
         label="رقم الهاتف"
         type="tel"
-        placeholder="0555 123 456"
+        placeholder="0699596108"
         value={formData.phone}
         onChange={(e) => setFormData((d) => ({ ...d, phone: e.target.value }))}
         error={errors.phone}

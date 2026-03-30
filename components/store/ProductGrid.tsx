@@ -1,5 +1,3 @@
-'use client'
-
 import { Package } from 'lucide-react'
 import { EmptyState } from '@/components/ui'
 import ProductCard from './ProductCard'

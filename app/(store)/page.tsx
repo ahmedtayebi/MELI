@@ -9,7 +9,7 @@ export default async function StorePage() {
   const { data } = await supabase
     .from('products')
     .select(
-      `id, name, is_visible, created_at, updated_at,
+      `id, name, price, is_visible, created_at, updated_at,
        product_colors(id, product_id, name, hex_code, image_url, is_visible),
        product_sizes(id, product_id, label, is_visible, sort_order)`
     )
@@ -19,6 +19,7 @@ export default async function StorePage() {
   const products: Product[] = ((data ?? []) as any[]).map((p) => ({
     id: p.id,
     name: p.name,
+    price: p.price ?? 0,
     is_visible: p.is_visible,
     created_at: p.created_at,
     updated_at: p.updated_at,
@@ -81,7 +82,7 @@ function HeroSection() {
           </div>
 
           {/* Tagline */}
-          <p className="text-muted font-body text-base mb-8 max-w-xs">
+          <p className="text-muted font-body text-2xl mb-8 max-w-xs">
             عباءات مصممة بعناية للمرأة الجزائرية العصرية
           </p>
 

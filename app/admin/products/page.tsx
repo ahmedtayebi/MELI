@@ -8,7 +8,7 @@ export default async function AdminProductsPage() {
   const { data } = await supabase
     .from('products')
     .select(
-      `id, name, is_visible, created_at, updated_at,
+      `id, name, price, is_visible, created_at, updated_at,
        product_colors(id, product_id, name, hex_code, image_url, is_visible),
        product_sizes(id, product_id, label, is_visible, sort_order)`
     )

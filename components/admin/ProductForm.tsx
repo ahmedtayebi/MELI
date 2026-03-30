@@ -82,6 +82,7 @@ export default function ProductForm({ productId, initialData }: Props) {
   const isEdit = !!initialData
 
   const [name, setName] = useState(initialData?.name ?? '')
+  const [price, setPrice] = useState<string>(initialData?.price !== undefined ? String(initialData.price) : '')
   const [isVisible, setIsVisible] = useState(initialData?.is_visible ?? true)
   const [colors, setColors] = useState<ColorEntry[]>(buildInitialColors(initialData))
   const [sizes, setSizes] = useState<SizeEntry[]>(buildInitialSizes(initialData))
@@ -174,6 +175,8 @@ export default function ProductForm({ productId, initialData }: Props) {
   const handleSave = async () => {
     setError('')
     if (!name.trim()) { setError('يرجى إدخال اسم المنتج'); return }
+    const priceNum = Number(price)
+    if (price === '' || isNaN(priceNum) || priceNum < 0) { setError('يرجى إدخال سعر صحيح'); return }
 
     const activeColors = colors.filter(c => !c.toDelete)
     if (activeColors.length === 0) { setError('يرجى إضافة لون واحد على الأقل'); return }
@@ -186,7 +189,7 @@ export default function ProductForm({ productId, initialData }: Props) {
       // 1. Upsert product
       const { error: productError } = await supabase
         .from('products')
-        .upsert({ id: productId, name: name.trim(), is_visible: isVisible })
+        .upsert({ id: productId, name: name.trim(), price: priceNum, is_visible: isVisible })
       if (productError) throw new Error(productError.message)
 
       // 2. Process colors
@@ -308,6 +311,21 @@ export default function ProductForm({ productId, initialData }: Props) {
           onChange={e => setName(e.target.value)}
           placeholder="مثال: عباية سوداء فاخرة"
           className="w-full border border-border rounded-xl px-4 py-2.5 text-sm text-brand placeholder:text-muted focus:outline-none focus:border-brand focus:ring-2 focus:ring-brand/10 font-body"
+        />
+      </section>
+
+      {/* Price */}
+      <section className="bg-white rounded-xl border border-border p-5 space-y-4">
+        <h2 className="font-heading font-bold text-base text-brand">السعر بالدينار الجزائري</h2>
+        <input
+          type="number"
+          min={0}
+          step={1}
+          value={price}
+          onChange={e => setPrice(e.target.value)}
+          placeholder="مثال: 2500"
+          className="w-full border border-border rounded-xl px-4 py-2.5 text-sm text-brand placeholder:text-muted focus:outline-none focus:border-brand focus:ring-2 focus:ring-brand/10 font-body"
+          dir="ltr"
         />
       </section>
 
