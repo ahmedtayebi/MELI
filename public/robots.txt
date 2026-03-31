@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+Disallow: /_next/
+
+Sitemap: https://meli-theta.vercel.app/sitemap.xml

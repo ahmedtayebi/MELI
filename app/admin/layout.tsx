@@ -4,6 +4,7 @@ import AdminBottomNav from '@/components/admin/AdminBottomNav'
 
 export const metadata: Metadata = {
   title: 'MELY•IMA — لوحة التحكم',
+  robots: { index: false, follow: false },
 }
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
