@@ -77,7 +77,7 @@ export default function Footer() {
               {[
                 { icon: Phone,  text: '0665967348',    href: 'tel:0699596108'         },
                 { icon: Mail,   text: 'info@melyima.dz', href: 'mailto:info@melyima.dz' },
-                { icon: MapPin, text: 'الجزائر',         href: '#'                      },
+                { icon: MapPin, text: 'بسكرة',         href: '#'                      },
               ].map(({ icon: Icon, text, href }) => (
                 <a
                   key={text}

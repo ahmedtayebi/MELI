@@ -88,22 +88,16 @@ function StatementSection() {
 
 function HeroSection() {
   return (
-    <section className="flex flex-col lg:flex-row">
-      {/* Image area — RIGHT in RTL (55%) */}
-      <div
-        className="relative h-[56vw] lg:h-[85vh] lg:w-[55%] bg-brand overflow-hidden"
-        style={{
-          backgroundImage: `repeating-linear-gradient(
-            -45deg,
-            transparent,
-            transparent 20px,
-            rgba(255,255,255,0.025) 20px,
-            rgba(255,255,255,0.025) 21px
-          )`,
-        }}
-      >
-        {/* Bottom overlay text */}
-        <div className="absolute inset-x-0 bottom-0 p-8 lg:p-14 bg-gradient-to-t from-black/60 to-transparent">
+    <section className="flex flex-col lg:flex-row-reverse">
+
+      {/* Image area — LEFT in RTL (55%) */}
+      <div className="relative h-[70vw] lg:h-[85vh] lg:w-[55%] overflow-hidden">
+        <img
+          src="/hero.jpg"
+          alt="MELY•IMA عباءة"
+          className="w-full h-full object-cover object-center"
+        />
+        {/* <div className="absolute inset-x-0 bottom-0 p-8 lg:p-14 bg-gradient-to-t from-black/70 to-transparent">
           <h1 className="font-heading font-black text-3xl sm:text-4xl lg:text-5xl text-white leading-snug">
             أناقة يومية،
             <br />
@@ -112,31 +106,27 @@ function HeroSection() {
           <p className="mt-2 text-white/60 font-body text-sm lg:text-base">
             تشكيلة عبايات MELY•IMA
           </p>
-        </div>
+        </div> */}
       </div>
 
-      {/* Content area — LEFT in RTL (45%) */}
-      <div className="lg:w-[45%] lg:h-[85vh] bg-[#fffbf1] flex flex-col justify-center px-8 lg:px-16 py-12 lg:py-0">
-        <div className="flex flex-col items-center lg:items-start text-center lg:text-start">
-          {/* Decorative accent line */}
-          <div className="w-16 h-0.5 bg-accent mb-4" />
-
-          {/* Wordmark */}
-          <div className="font-heading font-black text-5xl lg:text-6xl text-brand leading-none mb-4 tracking-tight">
+      {/* Content area — RIGHT in RTL (45%) */}
+      <div className="lg:w-[45%] lg:h-[85vh] bg-surface flex flex-col justify-center py-12 lg:py-0">
+        <div className="flex flex-col w-full px-8 lg:px-16" style={{ alignItems: 'flex-right', textAlign: 'right' }}>
+          <div style={{ width: '64px', height: '2px', backgroundColor: '#8B1A2E', marginBottom: '16px', alignSelf: 'flex-right' }} />
+          <div className="font-heading font-black text-5xl lg:text-6xl text-brand leading-none mb-4 tracking-tight" style={{ width: '100%', textAlign: 'right' }}>
             MELY<span className="text-accent">•</span>IMA
           </div>
-
-          {/* Tagline */}
-          <p className="text-muted font-body text-2xl mb-8 max-w-xs">
+          <p className="text-muted font-body text-2xl mb-8" style={{ width: '100%', textAlign: 'right' }}>
             عباءات مصممة بعناية للمرأة الجزائرية العصرية
           </p>
-
-          {/* CTA */}
-          <a href="#products">
-            <Button size="lg">تسوقي الآن</Button>
-          </a>
+          <div style={{ width: '100%', display: 'flex', justifyContent: 'flex-right' }}>
+            <a href="#products">
+              <Button size="lg">تسوقي الآن</Button>
+            </a>
+          </div>
         </div>
       </div>
+
     </section>
   )
 }
