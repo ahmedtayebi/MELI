@@ -50,11 +50,17 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
 
             {/* Drawer panel — slides in from physical left */}
             <motion.div
-              className="fixed inset-y-0 left-0 w-full max-w-sm bg-white z-40 flex flex-col shadow-2xl"
+              className="fixed inset-y-0 left-0 w-full max-w-sm bg-white z-50 flex flex-col shadow-2xl"
               initial={{ x: '-100%' }}
               animate={{ x: 0 }}
               exit={{ x: '-100%' }}
               transition={{ type: 'tween', duration: 0.3, ease: 'easeInOut' }}
+              drag="x"
+              dragConstraints={{ left: 0, right: 0 }}
+              dragElastic={{ left: 0.3, right: 0 }}
+              onDragEnd={(_, info) => {
+                if (info.offset.x < -80) onClose()
+              }}
             >
               {/* ── Header ── */}
               <div className="flex items-center justify-between px-4 py-4 border-b border-border flex-shrink-0">
@@ -72,7 +78,7 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                 {/* Close — left side in RTL (last child) */}
                 <button
                   onClick={onClose}
-                  className="p-2 rounded-xl text-muted hover:text-brand hover:bg-surface transition-colors"
+                  className="p-3 min-w-[44px] min-h-[44px] rounded-xl text-muted hover:text-brand hover:bg-surface transition-colors flex items-center justify-center"
                   aria-label="إغلاق"
                 >
                   <X size={20} />
