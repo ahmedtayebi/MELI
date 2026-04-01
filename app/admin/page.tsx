@@ -8,7 +8,9 @@ export default async function AdminOrdersPage() {
   const { data } = await supabase
     .from('orders')
     .select(
-      `id, customer_name, phone, wilaya, status, notes, created_at, updated_at,
+      `id, customer_name, phone, phone2, wilaya, wilaya_name,
+       delivery_type, delivery_price, products_total, total_price, address,
+       status, notes, created_at, updated_at,
        order_items(id, order_id, product_id, product_name, color_name, color_hex, color_image_url, size_label, quantity)`
     )
     .order('created_at', { ascending: false })

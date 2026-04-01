@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 import { useCartStore } from '@/lib/cart-store'
 import type { Product } from '@/lib/types'
 
@@ -31,6 +32,7 @@ export default function ProductCard({ product }: { product: Product }) {
       size_id: size.id,
       size_label: size.label,
       quantity: 1,
+      price: product.price,
     })
     setAdded(true)
     setTimeout(() => setAdded(false), 1500)
@@ -42,7 +44,7 @@ export default function ProductCard({ product }: { product: Product }) {
                     hover:shadow-md transition-shadow duration-200">
 
       {/* RIGHT — Image (RTL: right side) */}
-      <div className="w-[42%] shrink-0 relative bg-surface overflow-hidden">
+      <Link href={`/products/${product.id}`} className="w-[42%] shrink-0 relative bg-surface overflow-hidden">
         {selectedColor?.image_url ? (
           <img
             src={selectedColor.image_url}
@@ -56,7 +58,7 @@ export default function ProductCard({ product }: { product: Product }) {
             </span>
           </div>
         )}
-      </div>
+      </Link>
 
       {/* LEFT — Content */}
       <div className="flex-1 flex flex-col justify-between p-3 overflow-hidden">

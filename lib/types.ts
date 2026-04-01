@@ -1,12 +1,29 @@
+export interface Category {
+  id: string
+  name: string
+  sort_order: number
+  is_visible: boolean
+  created_at: string
+}
+
 export interface Product {
   id: string
   name: string
   price: number
+  description: string | null
   is_visible: boolean
+  category_id: string | null
   created_at: string
   updated_at: string
   product_colors?: ProductColor[]
   product_sizes?: ProductSize[]
+}
+
+export interface ProductColorImage {
+  id: string
+  color_id: string
+  image_url: string
+  sort_order: number
 }
 
 export interface ProductColor {
@@ -16,6 +33,7 @@ export interface ProductColor {
   hex_code: string
   image_url: string | null
   is_visible: boolean
+  images?: ProductColorImage[]
 }
 
 export interface ProductSize {
@@ -30,7 +48,14 @@ export interface Order {
   id: string
   customer_name: string
   phone: string
+  phone2: string | null
   wilaya: string
+  wilaya_name: string | null
+  delivery_type: 'home' | 'office'
+  delivery_price: number
+  products_total: number
+  total_price: number
+  address: string | null
   status: 'pending' | 'confirmed' | 'delivered' | 'cancelled'
   notes: string | null
   created_at: string
@@ -60,4 +85,5 @@ export interface CartItem {
   size_id: string
   size_label: string
   quantity: number
+  price: number
 }

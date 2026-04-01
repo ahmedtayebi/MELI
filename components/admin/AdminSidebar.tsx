@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation'
 import { ShoppingBag, Package, PlusCircle, LogOut } from 'lucide-react'
 import { signOut } from '@/app/admin/actions'
 import { cn } from '@/lib/utils'
+import NotificationToggle from './NotificationToggle'
 
 const navItems = [
   { href: '/admin', label: 'الطلبات', icon: ShoppingBag, exact: true },
@@ -54,8 +55,13 @@ export default function AdminSidebar() {
         ))}
       </nav>
 
+      {/* Notification toggle */}
+      <div className="px-3 py-3 border-t border-white/10">
+        <NotificationToggle />
+      </div>
+
       {/* Logout */}
-      <div className="px-3 py-4 border-t border-white/10">
+      <div className="px-3 py-3 border-t border-white/10">
         <form action={signOut}>
           <button
             type="submit"

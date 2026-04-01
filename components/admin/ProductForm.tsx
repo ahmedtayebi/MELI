@@ -2,24 +2,32 @@
 
 import { useState, useRef, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
-import { Plus, Trash2, Upload, GripVertical, Eye, EyeOff, X } from 'lucide-react'
+import { Plus, Trash2, GripVertical, Eye, EyeOff, X } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import Button from '@/components/ui/Button'
 import { cn } from '@/lib/utils'
-import type { Product, ProductColor, ProductSize } from '@/lib/types'
+import type { Product } from '@/lib/types'
 
 // ── Local state types ──────────────────────────────────────────────────────────
 
+interface ImageEntry {
+  id?: string        // existing DB id (undefined for new)
+  file?: File        // only for new uploads
+  preview: string    // objectURL or existing URL
+  existing: boolean
+  sort_order: number
+  toDelete?: boolean
+}
+
 interface ColorEntry {
-  id: string          // existing DB id or temp uuid
+  id: string
   isNew: boolean
   name: string
   hex_code: string
-  image_url: string | null   // existing URL
-  imageFile: File | null     // pending upload
-  imagePreview: string | null
+  image_url: string | null   // backward compat — set to first image URL on save
   is_visible: boolean
   toDelete?: boolean
+  images: ImageEntry[]
 }
 
 interface SizeEntry {
@@ -49,9 +57,13 @@ function buildInitialColors(product?: Product): ColorEntry[] {
     name: c.name,
     hex_code: c.hex_code,
     image_url: c.image_url,
-    imageFile: null,
-    imagePreview: null,
     is_visible: c.is_visible,
+    images: (c.images ?? []).map(img => ({
+      id: img.id,
+      preview: img.image_url,
+      existing: true,
+      sort_order: img.sort_order,
+    })),
   }))
 }
 
@@ -73,17 +85,20 @@ function buildInitialSizes(product?: Product): SizeEntry[] {
 interface Props {
   productId: string
   initialData?: Product
+  categories?: { id: string; name: string }[]
 }
 
 // ── Component ──────────────────────────────────────────────────────────────────
 
-export default function ProductForm({ productId, initialData }: Props) {
+export default function ProductForm({ productId, initialData, categories = [] }: Props) {
   const router = useRouter()
   const isEdit = !!initialData
 
   const [name, setName] = useState(initialData?.name ?? '')
+  const [description, setDescription] = useState(initialData?.description ?? '')
   const [price, setPrice] = useState<string>(initialData?.price !== undefined ? String(initialData.price) : '')
   const [isVisible, setIsVisible] = useState(initialData?.is_visible ?? true)
+  const [categoryId, setCategoryId] = useState<string>(initialData?.category_id ?? '')
   const [colors, setColors] = useState<ColorEntry[]>(buildInitialColors(initialData))
   const [sizes, setSizes] = useState<SizeEntry[]>(buildInitialSizes(initialData))
   const [customSize, setCustomSize] = useState('')
@@ -91,7 +106,7 @@ export default function ProductForm({ productId, initialData }: Props) {
   const [error, setError] = useState('')
 
   // Drag state for size reorder
-  const dragIndex = useRef<number | null>(null)
+  const dragSizeIndex = useRef<number | null>(null)
 
   // ── Color helpers ────────────────────────────────────────────────────────────
 
@@ -102,9 +117,8 @@ export default function ProductForm({ productId, initialData }: Props) {
       name: '',
       hex_code: '#000000',
       image_url: null,
-      imageFile: null,
-      imagePreview: null,
       is_visible: true,
+      images: [],
     }])
   }
 
@@ -118,9 +132,48 @@ export default function ProductForm({ productId, initialData }: Props) {
     ).filter(Boolean))
   }
 
-  const handleImageDrop = useCallback((id: string, file: File) => {
-    const preview = URL.createObjectURL(file)
-    updateColor(id, { imageFile: file, imagePreview: preview })
+  const addImagesToColor = useCallback((colorId: string, files: FileList) => {
+    setColors(prev => prev.map(c => {
+      if (c.id !== colorId) return c
+      const existingActive = c.images.filter(i => !i.toDelete)
+      const newImages: ImageEntry[] = Array.from(files).map((file, i) => ({
+        file,
+        preview: URL.createObjectURL(file),
+        existing: false,
+        sort_order: existingActive.length + i,
+      }))
+      return { ...c, images: [...c.images, ...newImages] }
+    }))
+  }, [])
+
+  const removeImageFromColor = useCallback((colorId: string, imgIdx: number) => {
+    setColors(prev => prev.map(c => {
+      if (c.id !== colorId) return c
+      const active = c.images.filter(i => !i.toDelete)
+      const target = active[imgIdx]
+      if (!target) return c
+      const images = c.images.map(img => {
+        if (img !== target) return img
+        return img.existing ? { ...img, toDelete: true } : null!
+      }).filter(Boolean)
+      // Re-number sort_order
+      const reNumbered = images.map((img, i) => img.toDelete ? img : { ...img, sort_order: images.filter(x => !x.toDelete).indexOf(img) })
+      return { ...c, images: reNumbered }
+    }))
+  }, [])
+
+  const reorderColorImages = useCallback((colorId: string, fromIdx: number, toIdx: number) => {
+    if (fromIdx === toIdx) return
+    setColors(prev => prev.map(c => {
+      if (c.id !== colorId) return c
+      const active = c.images.filter(i => !i.toDelete)
+      const deleted = c.images.filter(i => i.toDelete)
+      const reordered = [...active]
+      const [moved] = reordered.splice(fromIdx, 1)
+      reordered.splice(toIdx, 0, moved)
+      const withOrder = reordered.map((img, i) => ({ ...img, sort_order: i }))
+      return { ...c, images: [...withOrder, ...deleted] }
+    }))
   }, [])
 
   // ── Size helpers ─────────────────────────────────────────────────────────────
@@ -152,11 +205,11 @@ export default function ProductForm({ productId, initialData }: Props) {
 
   const visibleSizes = sizes.filter(s => !s.toDelete)
 
-  const onDragStart = (idx: number) => { dragIndex.current = idx }
+  const onSizeDragStart = (idx: number) => { dragSizeIndex.current = idx }
 
-  const onDragOver = (e: React.DragEvent, idx: number) => {
+  const onSizeDragOver = (e: React.DragEvent, idx: number) => {
     e.preventDefault()
-    const from = dragIndex.current
+    const from = dragSizeIndex.current
     if (from === null || from === idx) return
     setSizes(prev => {
       const visible = prev.filter(s => !s.toDelete)
@@ -165,7 +218,7 @@ export default function ProductForm({ productId, initialData }: Props) {
       const [moved] = reordered.splice(from, 1)
       reordered.splice(idx, 0, moved)
       const withOrder = reordered.map((s, i) => ({ ...s, sort_order: i }))
-      dragIndex.current = idx
+      dragSizeIndex.current = idx
       return [...withOrder, ...deleted]
     })
   }
@@ -189,65 +242,101 @@ export default function ProductForm({ productId, initialData }: Props) {
       // 1. Upsert product
       const { error: productError } = await supabase
         .from('products')
-        .upsert({ id: productId, name: name.trim(), price: priceNum, is_visible: isVisible })
+        .upsert({
+          id: productId,
+          name: name.trim(),
+          price: priceNum,
+          description: description.trim() || null,
+          is_visible: isVisible,
+          category_id: categoryId || null,
+        })
       if (productError) throw new Error(productError.message)
 
       // 2. Process colors
       for (const color of colors) {
         if (color.toDelete) {
-          // Delete image from storage if exists
-          if (color.image_url) {
-            const path = `${productId}/${color.id}.webp`
-            await supabase.storage.from('product-images').remove([path])
-          }
+          // Delete all color images first
+          await supabase.from('product_color_images').delete().eq('color_id', color.id)
           await supabase.from('product_colors').delete().eq('id', color.id)
           continue
         }
 
-        let image_url = color.image_url
-        if (color.imageFile) {
-          const path = `${productId}/${color.id}.webp`
-          const { error: uploadError } = await supabase.storage
-            .from('product-images')
-            .upload(path, color.imageFile, { upsert: true, contentType: 'image/webp' })
-          if (!uploadError) {
-            const { data: { publicUrl } } = supabase.storage
-              .from('product-images')
-              .getPublicUrl(path)
-            image_url = publicUrl
-          }
-        }
-
-        const colorPayload = {
-          id: color.isNew ? color.id.replace('new_', '') : color.id,
-          product_id: productId,
-          name: color.name.trim(),
-          hex_code: color.hex_code,
-          image_url,
-          is_visible: color.is_visible,
-        }
+        let actualColorId = color.id
 
         if (color.isNew) {
-          // Use a real UUID for new colors
-          const { error: insertError } = await supabase
+          const { data: insertedColor, error: insertError } = await supabase
             .from('product_colors')
-            .insert({ ...colorPayload, id: undefined })
+            .insert({
+              product_id: productId,
+              name: color.name.trim(),
+              hex_code: color.hex_code,
+              image_url: null,
+              is_visible: color.is_visible,
+            })
+            .select('id')
+            .single()
           if (insertError) throw new Error(insertError.message)
+          actualColorId = insertedColor!.id
         } else {
           const { error: updateError } = await supabase
             .from('product_colors')
             .update({
               name: color.name.trim(),
               hex_code: color.hex_code,
-              image_url,
               is_visible: color.is_visible,
             })
             .eq('id', color.id)
           if (updateError) throw new Error(updateError.message)
         }
+
+        // 3. Process images for this color
+        const finalUrls: { url: string; sort_order: number }[] = []
+
+        for (const img of color.images) {
+          if (img.toDelete) {
+            if (img.id) {
+              await supabase.from('product_color_images').delete().eq('id', img.id)
+            }
+            continue
+          }
+
+          if (img.existing) {
+            if (img.id) {
+              await supabase
+                .from('product_color_images')
+                .update({ sort_order: img.sort_order })
+                .eq('id', img.id)
+            }
+            finalUrls.push({ url: img.preview, sort_order: img.sort_order })
+          } else if (img.file) {
+            const timestamp = Date.now() + Math.random()
+            const path = `${productId}/${actualColorId}/${timestamp}.webp`
+            const { error: uploadError } = await supabase.storage
+              .from('product-images')
+              .upload(path, img.file, { upsert: true, contentType: 'image/webp' })
+            if (!uploadError) {
+              const { data: { publicUrl } } = supabase.storage
+                .from('product-images')
+                .getPublicUrl(path)
+              await supabase.from('product_color_images').insert({
+                color_id: actualColorId,
+                image_url: publicUrl,
+                sort_order: img.sort_order,
+              })
+              finalUrls.push({ url: publicUrl, sort_order: img.sort_order })
+            }
+          }
+        }
+
+        // 4. Update image_url to first image for backward compat
+        const sorted = finalUrls.sort((a, b) => a.sort_order - b.sort_order)
+        await supabase
+          .from('product_colors')
+          .update({ image_url: sorted[0]?.url ?? null })
+          .eq('id', actualColorId)
       }
 
-      // 3. Process sizes
+      // 5. Process sizes
       for (const size of sizes) {
         if (size.toDelete) {
           await supabase.from('product_sizes').delete().eq('id', size.id)
@@ -314,6 +403,18 @@ export default function ProductForm({ productId, initialData }: Props) {
         />
       </section>
 
+      {/* Description */}
+      <section className="bg-white rounded-xl border border-border p-5 space-y-4">
+        <h2 className="font-heading font-bold text-base text-brand">وصف المنتج</h2>
+        <textarea
+          value={description}
+          onChange={e => setDescription(e.target.value)}
+          placeholder="اكتبي تفاصيل المنتج، المقاس، القماش، المميزات..."
+          rows={4}
+          className="w-full border border-border rounded-xl px-4 py-3 text-sm text-brand placeholder:text-muted focus:outline-none focus:border-brand focus:ring-2 focus:ring-brand/10 font-body text-right resize-none"
+        />
+      </section>
+
       {/* Price */}
       <section className="bg-white rounded-xl border border-border p-5 space-y-4">
         <h2 className="font-heading font-bold text-base text-brand">السعر بالدينار الجزائري</h2>
@@ -328,6 +429,23 @@ export default function ProductForm({ productId, initialData }: Props) {
           dir="ltr"
         />
       </section>
+
+      {/* Category */}
+      {categories.length > 0 && (
+        <section className="bg-white rounded-xl border border-border p-5 space-y-4">
+          <h2 className="font-heading font-bold text-base text-brand">التصنيف</h2>
+          <select
+            value={categoryId}
+            onChange={e => setCategoryId(e.target.value)}
+            className="w-full border border-border rounded-xl px-4 py-2.5 text-sm text-brand focus:outline-none focus:border-brand focus:ring-2 focus:ring-brand/10 font-body bg-white"
+          >
+            <option value="">بدون تصنيف</option>
+            {categories.map(cat => (
+              <option key={cat.id} value={cat.id}>{cat.name}</option>
+            ))}
+          </select>
+        </section>
+      )}
 
       {/* Visibility */}
       <section className="bg-white rounded-xl border border-border p-5">
@@ -379,7 +497,9 @@ export default function ProductForm({ productId, initialData }: Props) {
               color={color}
               onChange={patch => updateColor(color.id, patch)}
               onRemove={() => removeColor(color.id)}
-              onImageDrop={file => handleImageDrop(color.id, file)}
+              onAddImages={files => addImagesToColor(color.id, files)}
+              onRemoveImage={idx => removeImageFromColor(color.id, idx)}
+              onReorderImage={(from, to) => reorderColorImages(color.id, from, to)}
             />
           ))}
         </div>
@@ -434,8 +554,8 @@ export default function ProductForm({ productId, initialData }: Props) {
               <div
                 key={size.id}
                 draggable
-                onDragStart={() => onDragStart(idx)}
-                onDragOver={e => onDragOver(e, idx)}
+                onDragStart={() => onSizeDragStart(idx)}
+                onDragOver={e => onSizeDragOver(e, idx)}
                 className="flex items-center gap-3 bg-surface rounded-xl px-3 py-2.5 border border-border cursor-grab active:cursor-grabbing"
               >
                 <GripVertical size={14} className="text-muted flex-shrink-0" />
@@ -481,19 +601,14 @@ interface ColorRowProps {
   color: ColorEntry
   onChange: (patch: Partial<ColorEntry>) => void
   onRemove: () => void
-  onImageDrop: (file: File) => void
+  onAddImages: (files: FileList) => void
+  onRemoveImage: (idx: number) => void
+  onReorderImage: (fromIdx: number, toIdx: number) => void
 }
 
-function ColorRow({ color, onChange, onRemove, onImageDrop }: ColorRowProps) {
-  const fileRef = useRef<HTMLInputElement>(null)
-  const [draggingOver, setDraggingOver] = useState(false)
-
-  const preview = color.imagePreview ?? color.image_url
-
-  const handleFiles = (files: FileList | null) => {
-    if (!files?.length) return
-    onImageDrop(files[0])
-  }
+function ColorRow({ color, onChange, onRemove, onAddImages, onRemoveImage, onReorderImage }: ColorRowProps) {
+  const dragImgIndex = useRef<number | null>(null)
+  const activeImages = color.images.filter(img => !img.toDelete)
 
   return (
     <div className="border border-border rounded-xl p-4 space-y-3">
@@ -555,46 +670,77 @@ function ColorRow({ color, onChange, onRemove, onImageDrop }: ColorRowProps) {
         </button>
       </div>
 
-      {/* Image drop zone */}
-      <div
-        className={cn(
-          'relative rounded-xl border-2 border-dashed transition-colors cursor-pointer',
-          draggingOver ? 'border-accent bg-accent/5' : 'border-border hover:border-brand/50'
-        )}
-        style={{ minHeight: 100 }}
-        onClick={() => fileRef.current?.click()}
-        onDragOver={e => { e.preventDefault(); setDraggingOver(true) }}
-        onDragLeave={() => setDraggingOver(false)}
-        onDrop={e => {
-          e.preventDefault()
-          setDraggingOver(false)
-          handleFiles(e.dataTransfer.files)
-        }}
-      >
-        {preview ? (
-          <div className="relative aspect-[4/3]">
-            <img src={preview} alt="" className="w-full h-full object-cover rounded-xl" />
-            <button
-              onClick={e => { e.stopPropagation(); onChange({ imageFile: null, imagePreview: null, image_url: null }) }}
-              className="absolute top-2 left-2 p-1 bg-white/90 rounded-full shadow text-brand hover:text-red-500 transition-colors"
-            >
-              <X size={13} />
-            </button>
-          </div>
-        ) : (
-          <div className="flex flex-col items-center justify-center py-6 gap-2">
-            <Upload size={20} className="text-muted" />
-            <p className="text-xs text-muted font-body">اسحب الصورة هنا أو انقر للاختيار</p>
-          </div>
-        )}
-        <input
-          ref={fileRef}
-          type="file"
-          accept="image/*"
-          className="sr-only"
-          onChange={e => handleFiles(e.target.files)}
-        />
+      {/* Images grid */}
+      <div>
+        <p className="text-xs text-muted font-body mb-2 text-right">صور اللون</p>
+        <div className="flex flex-wrap gap-2">
+          {activeImages.map((img, idx) => (
+            <ImageSlot
+              key={img.id ?? img.preview}
+              img={img}
+              idx={idx}
+              onRemove={() => onRemoveImage(idx)}
+              onDragStart={() => { dragImgIndex.current = idx }}
+              onDragOver={e => {
+                e.preventDefault()
+                const from = dragImgIndex.current
+                if (from !== null && from !== idx) {
+                  onReorderImage(from, idx)
+                  dragImgIndex.current = idx
+                }
+              }}
+            />
+          ))}
+
+          {/* Add images button */}
+          <label className="w-20 h-20 rounded-xl border-2 border-dashed border-border hover:border-brand/60 flex flex-col items-center justify-center cursor-pointer gap-1 transition-colors flex-shrink-0">
+            <Plus size={16} className="text-muted" />
+            <span className="text-[10px] text-muted font-body">إضافة</span>
+            <input
+              type="file"
+              accept="image/*"
+              multiple
+              className="sr-only"
+              onChange={e => { if (e.target.files?.length) onAddImages(e.target.files) }}
+            />
+          </label>
+        </div>
       </div>
+    </div>
+  )
+}
+
+// ── ImageSlot sub-component ────────────────────────────────────────────────────
+
+interface ImageSlotProps {
+  img: ImageEntry
+  idx: number
+  onRemove: () => void
+  onDragStart: () => void
+  onDragOver: (e: React.DragEvent) => void
+}
+
+function ImageSlot({ img, idx, onRemove, onDragStart, onDragOver }: ImageSlotProps) {
+  return (
+    <div
+      draggable
+      onDragStart={onDragStart}
+      onDragOver={onDragOver}
+      className="relative w-20 h-20 rounded-xl overflow-hidden border border-border cursor-grab active:cursor-grabbing flex-shrink-0"
+    >
+      <img src={img.preview} alt="" className="w-full h-full object-cover" />
+      <button
+        type="button"
+        onClick={e => { e.stopPropagation(); onRemove() }}
+        className="absolute top-1 right-1 w-5 h-5 bg-white/90 rounded-full flex items-center justify-center shadow text-brand hover:text-red-500 transition-colors"
+      >
+        <X size={11} />
+      </button>
+      {idx === 0 && (
+        <div className="absolute bottom-0 left-0 right-0 bg-black/40 text-white text-[9px] text-center py-0.5 font-body pointer-events-none">
+          رئيسية
+        </div>
+      )}
     </div>
   )
 }

@@ -4,7 +4,11 @@ import { createClient } from '@supabase/supabase-js'
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
-    const { customer_name, phone, wilaya, notes, items } = body
+    const {
+      customer_name, phone, phone2, wilaya, wilaya_name,
+      delivery_type, delivery_price, products_total, total_price,
+      address, notes, items,
+    } = body
 
     // ── Validate ──────────────────────────────────────────────
     if (
@@ -20,6 +24,13 @@ export async function POST(req: NextRequest) {
       )
     }
 
+    if (!['home', 'office'].includes(delivery_type)) {
+      return NextResponse.json(
+        { success: false, error: 'نوع التوصيل غير صحيح' },
+        { status: 400 }
+      )
+    }
+
     const supabase = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY!
@@ -31,7 +42,14 @@ export async function POST(req: NextRequest) {
       .insert({
         customer_name: String(customer_name).trim(),
         phone: String(phone).trim(),
+        phone2: phone2 ? String(phone2).trim() : null,
         wilaya: String(wilaya),
+        wilaya_name: String(wilaya_name ?? ''),
+        delivery_type: String(delivery_type),
+        delivery_price: Number(delivery_price),
+        products_total: Number(products_total),
+        total_price: Number(total_price),
+        address: address ? String(address).trim() : null,
         notes: notes ? String(notes).trim() : null,
         status: 'pending',
       })
@@ -64,13 +82,26 @@ export async function POST(req: NextRequest) {
 
     if (itemsError) {
       console.error('Order items insert error:', itemsError)
-      // Roll back: delete the order
       await supabase.from('orders').delete().eq('id', order.id)
       return NextResponse.json(
         { success: false, error: 'تعذّر حفظ تفاصيل الطلب' },
         { status: 500 }
       )
     }
+
+    // Send push notification (non-blocking)
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
+    fetch(`${siteUrl}/api/notify`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        order_id: order.id,
+        customer_name: String(customer_name).trim(),
+        wilaya_name: String(wilaya_name ?? wilaya),
+        total_price: Number(total_price),
+        items_count: (items as any[]).reduce((sum, i) => sum + Number(i.quantity), 0),
+      }),
+    }).catch(err => console.error('Notify error:', err))
 
     return NextResponse.json({ success: true, order_id: order.id })
   } catch (err) {

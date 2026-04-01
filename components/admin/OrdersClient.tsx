@@ -178,7 +178,7 @@ export default function OrdersClient({ initialOrders }: Props) {
                     {order.phone}
                   </td>
                   <td className="px-4 py-3 font-body text-sm text-brand">
-                    {order.wilaya}
+                    {order.wilaya_name ?? order.wilaya}
                   </td>
                   <td className="px-4 py-3 font-body text-xs text-muted">
                     {order.order_items?.length ?? 0} قطعة
@@ -253,6 +253,39 @@ export default function OrdersClient({ initialOrders }: Props) {
                             ملاحظة: {order.notes}
                           </p>
                         )}
+                        {/* Delivery info */}
+                        <div className="flex items-center gap-4 mt-3 pt-3 border-t border-border flex-wrap">
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs text-muted font-body">نوع التوصيل:</span>
+                            <span className="text-xs font-heading font-bold text-brand">
+                              {order.delivery_type === 'home' ? 'توصيل للمنزل' : 'استلام من المكتب'}
+                            </span>
+                          </div>
+                          {order.address && (
+                            <div className="flex items-center gap-2">
+                              <span className="text-xs text-muted font-body">العنوان:</span>
+                              <span className="text-xs font-heading font-bold text-brand">{order.address}</span>
+                            </div>
+                          )}
+                          <div className="flex items-center gap-2 mr-auto">
+                            <span className="text-xs text-muted font-body">المنتجات:</span>
+                            <span className="text-xs font-heading font-bold text-brand">
+                              {order.products_total?.toLocaleString('ar-DZ')} دج
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs text-muted font-body">التوصيل:</span>
+                            <span className="text-xs font-heading font-bold text-brand">
+                              {order.delivery_price?.toLocaleString('ar-DZ')} دج
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs text-muted font-body">الإجمالي:</span>
+                            <span className="text-xs font-heading font-black text-accent">
+                              {order.total_price?.toLocaleString('ar-DZ')} دج
+                            </span>
+                          </div>
+                        </div>
                       </div>
                     </td>
                   </tr>
@@ -282,7 +315,7 @@ export default function OrdersClient({ initialOrders }: Props) {
               </span>
             </div>
             <div className="flex items-center gap-4 text-xs text-muted font-body">
-              <span>{order.wilaya}</span>
+              <span>{order.wilaya_name ?? order.wilaya}</span>
               <span>·</span>
               <span>{order.order_items?.length ?? 0} قطعة</span>
               <span>·</span>

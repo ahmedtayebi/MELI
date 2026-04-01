@@ -11,17 +11,40 @@ export default async function EditProductPage({ params }: Props) {
   const { id } = await params
   const supabase = await createClient()
 
-  const { data } = await supabase
-    .from('products')
-    .select(
-      `id, name, price, is_visible, created_at, updated_at,
-       product_colors(id, product_id, name, hex_code, image_url, is_visible),
-       product_sizes(id, product_id, label, is_visible, sort_order)`
-    )
-    .eq('id', id)
-    .single()
+  const [{ data }, { data: categories }] = await Promise.all([
+    supabase
+      .from('products')
+      .select(
+        `id, name, price, description, is_visible, category_id, created_at, updated_at,
+         product_colors(id, product_id, name, hex_code, image_url, is_visible,
+           product_color_images(id, color_id, image_url, sort_order)),
+         product_sizes(id, product_id, label, is_visible, sort_order)`
+      )
+      .eq('id', id)
+      .single(),
+    supabase
+      .from('categories')
+      .select('id, name')
+      .order('sort_order'),
+  ])
 
   if (!data) notFound()
 
-  return <ProductForm productId={id} initialData={data as Product} />
+  const product: Product = {
+    ...(data as any),
+    description: (data as any).description ?? null,
+    product_colors: ((data as any).product_colors ?? []).map((c: any) => ({
+      ...c,
+      images: (c.product_color_images ?? []).sort((a: any, b: any) => a.sort_order - b.sort_order),
+    })),
+    product_sizes: ((data as any).product_sizes ?? []).sort((a: any, b: any) => a.sort_order - b.sort_order),
+  }
+
+  return (
+    <ProductForm
+      productId={id}
+      initialData={product}
+      categories={categories ?? []}
+    />
+  )
 }
