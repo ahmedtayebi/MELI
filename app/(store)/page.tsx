@@ -46,8 +46,9 @@ export default async function StorePage() {
   return (
     <main className="pointer-events-auto">
       <HeroSection />
-      <StatementSection />
       <ProductsSection products={products} categories={categories} />
+      <StatementSection />
+
     </main>
   )
 }
@@ -114,15 +115,15 @@ function HeroSection() {
 
       {/* Content area — RIGHT in RTL (45%) */}
       <div className="lg:w-[45%] lg:h-[85vh] bg-surface flex flex-col justify-center py-12 lg:py-0">
-        <div className="flex flex-col w-full px-8 lg:px-16" style={{ alignItems: 'flex-end', textAlign: 'right' }}>
-          <div style={{ width: '64px', height: '2px', backgroundColor: '#8B1A2E', marginBottom: '16px', alignSelf: 'flex-end' }} />
+        <div className="flex flex-col w-full px-8 lg:px-16" style={{ alignItems: 'flex-right', textAlign: 'right' }}>
+          <div style={{ width: '64px', height: '2px', backgroundColor: '#8B1A2E', marginBottom: '16px', alignSelf: 'flex-right' }} />
           <div className="font-heading font-black text-5xl lg:text-6xl text-brand leading-none mb-4 tracking-tight" style={{ width: '100%', textAlign: 'right' }}>
             MELY<span className="text-accent">•</span>IMA
           </div>
           <p className="text-muted font-body text-2xl mb-8" style={{ width: '100%', textAlign: 'right' }}>
             عباءات مصممة بعناية للمرأة الجزائرية العصرية
           </p>
-          <div style={{ width: '100%', display: 'flex', justifyContent: 'flex-end' }}>
+          <div style={{ width: '100%', display: 'flex', justifyContent: 'flex-right' }}>
             <a href="#products">
               <Button size="lg">تسوقي الآن</Button>
             </a>
