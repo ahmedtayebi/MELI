@@ -12,37 +12,58 @@ export async function sendPushNotification({
   total_price: number
   items_count: number
 }) {
+  console.log('=== sendPushNotification START ===')
+  console.log('Params:', { customer_name, wilaya_name, total_price, items_count })
+
   try {
     const vapidEmail = process.env.VAPID_EMAIL
     const vapidPublicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY
     const vapidPrivateKey = process.env.VAPID_PRIVATE_KEY
 
+    console.log('VAPID check:', {
+      hasEmail: !!vapidEmail,
+      hasPublicKey: !!vapidPublicKey,
+      hasPrivateKey: !!vapidPrivateKey,
+      emailValue: vapidEmail?.substring(0, 20),
+    })
+
     if (!vapidEmail || !vapidPublicKey || !vapidPrivateKey) {
-      console.log('VAPID not configured — skipping push')
+      console.error('VAPID NOT CONFIGURED — missing env vars')
       return
     }
 
-    webpush.setVapidDetails(
-      vapidEmail.startsWith('mailto:') ? vapidEmail : `mailto:${vapidEmail}`,
-      vapidPublicKey,
-      vapidPrivateKey
-    )
+    const subject = vapidEmail.startsWith('mailto:')
+      ? vapidEmail
+      : `mailto:${vapidEmail}`
+
+    console.log('Setting VAPID details with subject:', subject)
+
+    webpush.setVapidDetails(subject, vapidPublicKey, vapidPrivateKey)
+
+    console.log('VAPID details set successfully')
 
     const supabase = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY!
     )
 
-    const { data: subscriptions } = await supabase
+    console.log('Fetching push subscriptions...')
+
+    const { data: subscriptions, error: dbError } = await supabase
       .from('push_subscriptions')
       .select('*')
 
-    if (!subscriptions || subscriptions.length === 0) {
-      console.log('No push subscriptions found')
+    if (dbError) {
+      console.error('DB error fetching subscriptions:', dbError)
       return
     }
 
-    console.log(`Sending push to ${subscriptions.length} subscription(s)`)
+    console.log('Subscriptions found:', subscriptions?.length ?? 0)
+
+    if (!subscriptions || subscriptions.length === 0) {
+      console.log('No subscriptions — nothing to send')
+      return
+    }
 
     const payload = JSON.stringify({
       title: '🛍️ طلب جديد!',
@@ -50,39 +71,49 @@ export async function sendPushNotification({
       url: '/admin',
     })
 
+    console.log('Payload prepared:', payload)
+    console.log(`Sending to ${subscriptions.length} subscription(s)...`)
+
     const results = await Promise.allSettled(
-      subscriptions.map(sub =>
-        webpush.sendNotification(
+      subscriptions.map((sub, index) => {
+        console.log(`Sending to subscription ${index}:`, sub.endpoint.substring(0, 50))
+        return webpush.sendNotification(
           {
             endpoint: sub.endpoint,
             keys: { p256dh: sub.p256dh, auth: sub.auth },
           },
           payload
         )
-      )
+      })
     )
 
     results.forEach((r, i) => {
-      if (r.status === 'rejected') {
-        console.error(`Push failed for sub ${i}:`, r.reason)
+      if (r.status === 'fulfilled') {
+        console.log(`✓ Push ${i} sent successfully:`, (r.value as any)?.statusCode)
       } else {
-        console.log(`Push sent successfully to sub ${i}`)
+        console.error(`✗ Push ${i} failed:`, {
+          message: (r.reason as any)?.message,
+          statusCode: (r.reason as any)?.statusCode,
+          body: (r.reason as any)?.body,
+        })
       }
     })
 
-    // Remove expired subscriptions
     const expiredEndpoints = results
       .map((r, i) => ({ r, sub: subscriptions[i] }))
       .filter(({ r }) => r.status === 'rejected')
       .map(({ sub }) => sub.endpoint)
 
     if (expiredEndpoints.length > 0) {
+      console.log('Removing expired subscriptions:', expiredEndpoints.length)
       await supabase
         .from('push_subscriptions')
         .delete()
         .in('endpoint', expiredEndpoints)
     }
+
+    console.log('=== sendPushNotification END ===')
   } catch (err) {
-    console.error('sendPushNotification error:', err)
+    console.error('=== sendPushNotification FATAL ERROR ===', err)
   }
 }
