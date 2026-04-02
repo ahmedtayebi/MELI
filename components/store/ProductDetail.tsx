@@ -4,6 +4,8 @@ import { useState, useCallback } from 'react'
 import Link from 'next/link'
 import { ChevronRight, ChevronLeft, ShoppingBag, Check } from 'lucide-react'
 import { useCartStore } from '@/lib/cart-store'
+import Modal from '@/components/ui/Modal'
+import OrderForm from './OrderForm'
 import type { Product } from '@/lib/types'
 
 export default function ProductDetail({ product }: { product: Product }) {
@@ -15,6 +17,7 @@ export default function ProductDetail({ product }: { product: Product }) {
   const [selectedSizeId, setSelectedSizeId] = useState('')
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const [added, setAdded] = useState(false)
+  const [buyNowOpen, setBuyNowOpen] = useState(false)
 
   const addItem = useCartStore(s => s.addItem)
   const selectedColor = visibleColors.find(c => c.id === selectedColorId) ?? visibleColors[0]
@@ -48,6 +51,29 @@ export default function ProductDetail({ product }: { product: Product }) {
     })
     setAdded(true)
     setTimeout(() => setAdded(false), 1500)
+  }
+
+  const handleBuyNow = () => {
+    if (!selectedSizeId || !selectedColor) return
+    const size = visibleSizes.find(s => s.id === selectedSizeId)
+    if (!size) return
+
+    const { clearCart, addItem } = useCartStore.getState()
+    clearCart()
+    addItem({
+      product_id: product.id,
+      product_name: product.name,
+      color_id: selectedColor.id,
+      color_name: selectedColor.name,
+      color_hex: selectedColor.hex_code,
+      color_image_url: colorImages[0] ?? selectedColor.image_url,
+      size_id: size.id,
+      size_label: size.label,
+      quantity: 1,
+      price: product.price,
+    })
+
+    setBuyNowOpen(true)
   }
 
   return (
@@ -224,16 +250,6 @@ export default function ProductDetail({ product }: { product: Product }) {
                 </div>
               </div>
             )}
-            {product.description && (
-              <div className="border-t border-border pt-6">
-                <h3 className="font-heading font-bold text-base text-brand text-right mb-3">
-                  تفاصيل المنتج
-                </h3>
-                <p className="font-body text-muted text-sm leading-relaxed text-right whitespace-pre-line">
-                  {product.description}
-                </p>
-              </div>
-            )}
 
 
             {/* Add to cart */}
@@ -257,11 +273,43 @@ export default function ProductDetail({ product }: { product: Product }) {
               )}
             </button>
 
-            {/* Description */}
+            {/* Buy now */}
+            <button
+              type="button"
+              onClick={handleBuyNow}
+              disabled={!selectedSizeId}
+              className="w-full h-14 rounded-2xl font-heading font-black text-base transition-all duration-200 flex items-center justify-center gap-2 border-2"
+              style={{
+                backgroundColor: 'transparent',
+                color: selectedSizeId ? '#8B1A2E' : '#6B6B6B',
+                borderColor: selectedSizeId ? '#8B1A2E' : '#E8E4DF',
+                cursor: !selectedSizeId ? 'not-allowed' : 'pointer',
+              }}
+            >
+              اطلبي الآن
+            </button>
+            {product.description && (
+              <div className="border-t border-border pt-6">
+                <h3 className="font-heading font-bold text-base text-brand text-right mb-3">
+                  تفاصيل المنتج
+                </h3>
+                <p className="font-body text-muted text-sm leading-relaxed text-right whitespace-pre-line">
+                  {product.description}
+                </p>
+              </div>
+            )}
 
           </div>
         </div>
       </div>
+
+      <Modal
+        isOpen={buyNowOpen}
+        onClose={() => setBuyNowOpen(false)}
+        title="تفاصيل الطلب"
+      >
+        <OrderForm onSuccess={() => setBuyNowOpen(false)} />
+      </Modal>
     </div>
   )
 }

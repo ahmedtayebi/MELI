@@ -74,7 +74,7 @@ export default function ReviewsSection({ reviews }: { reviews: Review[] }) {
   }
 
   return (
-    <section className="w-full py-16 lg:py-24" style={{ backgroundColor: '#F5EDD9' }}>
+    <section className="w-full py-16 lg:py-24" style={{ backgroundColor: '#fbfaf7ff' }}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
 
         {/* Header */}
@@ -106,7 +106,7 @@ export default function ReviewsSection({ reviews }: { reviews: Review[] }) {
               borderColor: showForm ? '#1a1a1a' : '#E8E4DF',
             }}
           >
-            {showForm ? '✕ إغلاق' : '+ أضيفي رأيك'}
+            {showForm ? 'إغلاق' : 'أضيفي رأيك'}
           </button>
         </div>
 

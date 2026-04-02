@@ -25,6 +25,7 @@ export default function OrderForm({ onSuccess }: OrderFormProps) {
     wilaya: '',
     delivery_type: 'home' as 'home' | 'office',
     address: '',
+    notes: '',
   })
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [submitting, setSubmitting] = useState(false)
@@ -83,6 +84,7 @@ export default function OrderForm({ onSuccess }: OrderFormProps) {
           products_total: productsTotal,
           total_price: totalPrice,
           address: formData.delivery_type === 'home' ? formData.address.trim() : null,
+          notes: formData.notes.trim() || null,
           items,
         }),
       })
@@ -258,6 +260,20 @@ export default function OrderForm({ onSuccess }: OrderFormProps) {
           )}
         </div>
       )}
+
+      {/* Notes — optional */}
+      <div>
+        <label className="block font-heading font-bold text-sm text-brand mb-2 text-right">
+          ملاحظات إضافية <span className="text-muted font-body">(اختياري)</span>
+        </label>
+        <textarea
+          value={formData.notes}
+          onChange={e => setFormData(d => ({ ...d, notes: e.target.value }))}
+          placeholder="أي تعليمات خاصة للطلب..."
+          rows={2}
+          className="w-full bg-white border border-border rounded-xl px-4 py-3 text-sm text-brand placeholder:text-muted focus:outline-none focus:border-brand focus:ring-2 focus:ring-brand/10 text-right resize-none"
+        />
+      </div>
 
       {/* Price summary */}
       {formData.wilaya && (

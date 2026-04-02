@@ -13,6 +13,7 @@ export interface Product {
   description: string | null
   is_visible: boolean
   category_id: string | null
+  sales_count: number
   created_at: string
   updated_at: string
   product_colors?: ProductColor[]

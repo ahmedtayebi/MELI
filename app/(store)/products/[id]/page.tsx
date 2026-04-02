@@ -30,6 +30,7 @@ export default async function ProductPage({ params }: Props) {
   const product: Product = {
     ...data,
     description: data.description ?? null,
+    sales_count: (data as any).sales_count ?? 0,
     product_colors: (data.product_colors ?? [])
       .filter((c: any) => c.is_visible)
       .map((c: any) => ({

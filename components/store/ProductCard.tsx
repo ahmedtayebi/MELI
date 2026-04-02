@@ -58,6 +58,24 @@ export default function ProductCard({ product }: { product: Product }) {
             </span>
           </div>
         )}
+        {(() => {
+          const isNew = new Date(product.created_at) > new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
+          const isBestSeller = product.sales_count > 0
+          return (
+            <>
+              {isNew && (
+                <span className="absolute top-2 right-2 bg-brand text-white text-[10px] font-heading font-bold px-2 py-0.5 rounded-full z-10">
+                  جديد
+                </span>
+              )}
+              {isBestSeller && !isNew && (
+                <span className="absolute top-2 right-2 bg-accent text-white text-[10px] font-heading font-bold px-2 py-0.5 rounded-full z-10">
+                  الأكثر مبيعاً
+                </span>
+              )}
+            </>
+          )
+        })()}
       </Link>
 
       {/* LEFT — Content */}

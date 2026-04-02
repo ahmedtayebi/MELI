@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
-import { Cairo, DM_Sans } from "next/font/google";
+import { Noto_Kufi_Arabic, DM_Sans } from "next/font/google";
 import "./globals.css";
 
-const cairo = Cairo({
-  variable: "--font-cairo",
-  subsets: ["arabic", "latin"],
-  weight: ["700", "900"],
+const notoKufi = Noto_Kufi_Arabic({
+  subsets: ["arabic"],
+  weight: ["400", "700", "900"],
+  variable: "--font-noto-kufi",
+  display: "swap",
 });
 
 const dmSans = DM_Sans({
@@ -91,7 +92,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ar" dir="rtl" className={`${cairo.variable} ${dmSans.variable}`} suppressHydrationWarning>
+    <html lang="ar" dir="rtl" className={`${notoKufi.variable} ${dmSans.variable}`} suppressHydrationWarning>
       <body>{children}</body>
     </html>
   );

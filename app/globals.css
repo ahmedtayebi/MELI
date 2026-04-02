@@ -10,7 +10,7 @@
   --color-white: #FFFFFF;
 
   /* Font families — variables injected by next/font/google */
-  --font-heading: var(--font-cairo);
+  --font-heading: var(--font-noto-kufi);
   --font-body: var(--font-dm-sans);
 
   /* Border radii */

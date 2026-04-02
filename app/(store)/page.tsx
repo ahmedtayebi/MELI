@@ -1,25 +1,64 @@
 import { createClient } from '@/lib/supabase/server'
 import ProductsSection from '@/components/store/ProductsSection'
+import BestSellersSection from '@/components/store/BestSellersSection'
 import ReviewsSection from '@/components/store/ReviewsSection'
 import Button from '@/components/ui/Button'
 import type { Product, Category, Review } from '@/lib/types'
 
+const PRODUCTS_SELECT = `
+  id, name, price, description, is_visible, category_id, sales_count, created_at, updated_at,
+  product_colors(id, product_id, name, hex_code, image_url, is_visible,
+    product_color_images(id, color_id, image_url, sort_order)),
+  product_sizes(id, product_id, label, is_visible, sort_order)
+`
+
+const mapProduct = (p: any): Product => ({
+  id: p.id,
+  name: p.name,
+  price: p.price ?? 0,
+  description: p.description ?? null,
+  is_visible: p.is_visible,
+  category_id: p.category_id ?? null,
+  sales_count: p.sales_count ?? 0,
+  created_at: p.created_at,
+  updated_at: p.updated_at,
+  product_colors: (p.product_colors ?? [])
+    .filter((c: any) => c.is_visible)
+    .map((c: any) => ({
+      ...c,
+      images: (c.product_color_images ?? [])
+        .sort((a: any, b: any) => a.sort_order - b.sort_order),
+    })),
+  product_sizes: (p.product_sizes ?? [])
+    .filter((s: any) => s.is_visible)
+    .filter((s: any, i: number, arr: any[]) =>
+      arr.findIndex((t: any) => t.label === s.label) === i)
+    .sort((a: any, b: any) => a.sort_order - b.sort_order),
+})
+
 export default async function StorePage() {
   const supabase = await createClient()
 
-  const [{ data: productsData }, { data: categoriesData }, { data: reviewsData }] = await Promise.all([
+  const [
+    { data: productsData },
+    { data: bestSellersData },
+    { data: categoriesData },
+    { data: reviewsData },
+  ] = await Promise.all([
     supabase
       .from('products')
-      .select(
-        `id, name, price, is_visible, category_id, created_at, updated_at,
-         product_colors(id, product_id, name, hex_code, image_url, is_visible, product_color_images(id, color_id, image_url, sort_order)),
-         product_sizes(id, product_id, label, is_visible, sort_order)`
-      )
+      .select(PRODUCTS_SELECT)
       .eq('is_visible', true)
       .order('created_at', { ascending: false }),
     supabase
+      .from('products')
+      .select(PRODUCTS_SELECT)
+      .eq('is_visible', true)
+      .order('sales_count', { ascending: false })
+      .limit(6),
+    supabase
       .from('categories')
-      .select('*')
+      .select('id, name, sort_order, is_visible')
       .eq('is_visible', true)
       .order('sort_order', { ascending: true }),
     supabase
@@ -30,32 +69,17 @@ export default async function StorePage() {
       .limit(20),
   ])
 
-  const products: Product[] = ((productsData ?? []) as any[]).map((p) => ({
-    id: p.id,
-    name: p.name,
-    price: p.price ?? 0,
-    description: p.description ?? null,
-    is_visible: p.is_visible,
-    category_id: p.category_id ?? null,
-    created_at: p.created_at,
-    updated_at: p.updated_at,
-    product_colors: (p.product_colors ?? []).filter((c: any) => c.is_visible).map((c: any) => ({
-      ...c,
-      images: (c.product_color_images ?? []).sort((a: any, b: any) => a.sort_order - b.sort_order),
-    })),
-    product_sizes: (p.product_sizes ?? [])
-      .filter((s: any) => s.is_visible)
-      .sort((a: any, b: any) => a.sort_order - b.sort_order),
-  }))
-
+  const products: Product[] = (productsData ?? []).map(mapProduct)
+  const bestSellers: Product[] = (bestSellersData ?? []).map(mapProduct)
   const categories: Category[] = (categoriesData ?? []) as Category[]
   const reviews: Review[] = (reviewsData ?? []) as Review[]
 
   return (
     <main className="pointer-events-auto">
       <HeroSection />
-      <ProductsSection products={products} categories={categories} />
       <ReviewsSection reviews={reviews} />
+      <BestSellersSection products={bestSellers} />
+      <ProductsSection products={products} categories={categories} />
       <StatementSection />
     </main>
   )
