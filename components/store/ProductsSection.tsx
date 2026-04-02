@@ -31,7 +31,7 @@ export default function ProductsSection({
 
           {/* Category tabs */}
           {categories.length > 0 && (
-            <div className="flex gap-2 overflow-x-auto pb-2 justify-center flex-wrap" style={{ scrollbarWidth: 'none' }}>
+            <div className="flex gap-2 overflow-x-auto pb-2 justify-center" style={{ scrollbarWidth: 'none', flexWrap: 'nowrap' }}>
               <button
                 onClick={() => setActiveCategory('all')}
                 className="flex-shrink-0 px-5 py-2 rounded-full text-sm font-heading font-bold transition-all duration-200"
