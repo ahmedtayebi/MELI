@@ -75,6 +75,15 @@ export interface OrderItem {
   quantity: number
 }
 
+export interface Review {
+  id: string
+  customer_name: string
+  rating: number
+  comment: string
+  status: 'pending' | 'approved' | 'rejected'
+  created_at: string
+}
+
 export interface CartItem {
   product_id: string
   product_name: string

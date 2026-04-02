@@ -2,12 +2,13 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { ShoppingBag, Package, PlusCircle, LogOut } from 'lucide-react'
+import { ShoppingBag, Package, PlusCircle, LogOut, MessageSquare } from 'lucide-react'
 import { signOut } from '@/app/admin/actions'
 import { cn } from '@/lib/utils'
 
 const tabs = [
   { href: '/admin', label: 'الطلبات', icon: ShoppingBag, exact: true },
+  { href: '/admin/reviews', label: 'التقييمات', icon: MessageSquare, exact: true },
   { href: '/admin/products', label: 'المنتجات', icon: Package, exact: false },
   { href: '/admin/products/new', label: 'إضافة', icon: PlusCircle, exact: true },
 ]

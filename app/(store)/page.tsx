@@ -1,12 +1,13 @@
 import { createClient } from '@/lib/supabase/server'
 import ProductsSection from '@/components/store/ProductsSection'
+import ReviewsSection from '@/components/store/ReviewsSection'
 import Button from '@/components/ui/Button'
-import type { Product, Category } from '@/lib/types'
+import type { Product, Category, Review } from '@/lib/types'
 
 export default async function StorePage() {
   const supabase = await createClient()
 
-  const [{ data: productsData }, { data: categoriesData }] = await Promise.all([
+  const [{ data: productsData }, { data: categoriesData }, { data: reviewsData }] = await Promise.all([
     supabase
       .from('products')
       .select(
@@ -21,6 +22,12 @@ export default async function StorePage() {
       .select('*')
       .eq('is_visible', true)
       .order('sort_order', { ascending: true }),
+    supabase
+      .from('reviews')
+      .select('*')
+      .eq('status', 'approved')
+      .order('created_at', { ascending: false })
+      .limit(20),
   ])
 
   const products: Product[] = ((productsData ?? []) as any[]).map((p) => ({
@@ -42,13 +49,14 @@ export default async function StorePage() {
   }))
 
   const categories: Category[] = (categoriesData ?? []) as Category[]
+  const reviews: Review[] = (reviewsData ?? []) as Review[]
 
   return (
     <main className="pointer-events-auto">
       <HeroSection />
       <ProductsSection products={products} categories={categories} />
+      <ReviewsSection reviews={reviews} />
       <StatementSection />
-
     </main>
   )
 }
