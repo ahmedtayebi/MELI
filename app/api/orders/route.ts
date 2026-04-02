@@ -90,8 +90,8 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    // Send push notification (non-blocking)
-    sendPushNotification({
+    // Send push notification (await before returning)
+    await sendPushNotification({
       customer_name: String(customer_name).trim(),
       wilaya_name: String(wilaya_name ?? wilaya),
       total_price: Number(total_price),
