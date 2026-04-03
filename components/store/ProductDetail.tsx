@@ -8,7 +8,7 @@ import Modal from '@/components/ui/Modal'
 import OrderForm from './OrderForm'
 import type { Product } from '@/lib/types'
 
-export default function ProductDetail({ product }: { product: Product }) {
+export default function ProductDetail({ product, storePolicy }: { product: Product; storePolicy: string }) {
   const visibleColors = product.product_colors?.filter(c => c.is_visible) ?? []
   const visibleSizes = product.product_sizes?.filter(s => s.is_visible)
     .filter((s, i, arr) => arr.findIndex(t => t.label === s.label) === i) ?? []
@@ -298,6 +298,71 @@ export default function ProductDetail({ product }: { product: Product }) {
                 </p>
               </div>
             )}
+
+            {/* Shipping & Payment & Policy */}
+            <div className="border-t border-border pt-6 space-y-4">
+
+              {/* Shipping */}
+              <div className="flex items-start gap-3 justify-right">
+                <div className="w-9 h-9 rounded-xl bg-surface border border-border flex items-center justify-center flex-shrink-0">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8B1A2E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="1" y="3" width="15" height="13" rx="1" />
+                    <path d="M16 8h4l3 5v3h-7V8z" />
+                    <circle cx="5.5" cy="18.5" r="2.5" />
+                    <circle cx="18.5" cy="18.5" r="2.5" />
+                  </svg>
+                </div>
+                <div className="text-right">
+                  <p className="font-heading font-bold text-sm text-brand mb-0.5">
+                    الشحن عبر World Express
+                  </p>
+                  <p className="font-body text-xs text-muted">
+                    توصيل لجميع ولايات الجزائر . 
+                  </p>
+                </div>
+
+              </div>
+
+              {/* Payment */}
+              <div className="flex items-start gap-3 justify-right">
+                <div className="w-9 h-9 rounded-xl bg-surface border border-border flex items-center justify-center flex-shrink-0">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8B1A2E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="1" y="4" width="22" height="16" rx="2" />
+                    <line x1="1" y1="10" x2="23" y2="10" />
+                  </svg>
+                </div>
+                <div className="text-right">
+                  <p className="font-heading font-bold text-sm text-brand mb-0.5">
+طرق الدفع
+                  </p>
+                  <p className="font-body text-xs text-muted">
+الدفع عند الاستلام
+                  </p>
+                </div>
+
+              </div>
+
+              {/* Store Policy */}
+              {storePolicy && (
+                <div className="flex items-start gap-3 justify-right">
+                  <div className="w-9 h-9 rounded-xl bg-surface border border-border flex items-center justify-center flex-shrink-0">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8B1A2E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                    </svg>
+                  </div>
+                  <div className="text-right">
+                    <p className="font-heading font-bold text-sm text-brand mb-0.5">
+                      سياسة المتجر
+                    </p>
+                    <p className="font-body text-xs text-muted leading-relaxed">
+                      {storePolicy}
+                    </p>
+                  </div>
+
+                </div>
+              )}
+
+            </div>
 
           </div>
         </div>

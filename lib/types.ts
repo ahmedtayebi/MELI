@@ -85,6 +85,11 @@ export interface Review {
   created_at: string
 }
 
+export interface StoreSettings {
+  key: string
+  value: string
+}
+
 export interface CartItem {
   product_id: string
   product_name: string

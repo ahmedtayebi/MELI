@@ -3,7 +3,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { ShoppingBag, Package, PlusCircle, LogOut, MessageSquare } from 'lucide-react'
+import { ShoppingBag, Package, PlusCircle, LogOut, MessageSquare, Settings } from 'lucide-react'
 import { signOut } from '@/app/admin/actions'
 import { cn } from '@/lib/utils'
 import NotificationToggle from './NotificationToggle'
@@ -13,6 +13,7 @@ const navItems = [
   { href: '/admin/reviews', label: 'التقييمات', icon: MessageSquare, exact: true },
   { href: '/admin/products', label: 'المنتجات', icon: Package, exact: false },
   { href: '/admin/products/new', label: 'إضافة منتج', icon: PlusCircle, exact: true },
+  { href: '/admin/settings', label: 'الإعدادات', icon: Settings, exact: true },
 ]
 
 export default function AdminSidebar() {

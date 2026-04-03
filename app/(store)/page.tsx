@@ -134,35 +134,32 @@ function StatementSection() {
 
 function HeroSection() {
   return (
-    <section className="flex flex-col lg:flex-row-reverse">
-
-      {/* Image area — LEFT in RTL (55%) */}
-      <div className="relative h-[70vw] lg:h-[85vh] lg:w-[55%] overflow-hidden">
-        <img
-          src="/hero.jpg"
-          alt="MELY•IMA عباءة"
-          className="w-full h-full object-cover object-center"
-        />
-      </div>
-
-      {/* Content area — RIGHT in RTL (45%) */}
-      <div className="lg:w-[45%] lg:h-[85vh] bg-surface flex flex-col justify-center py-12 lg:py-0">
-        <div className="flex flex-col w-full px-8 lg:px-16" style={{ alignItems: 'flex-right', textAlign: 'right' }}>
-          <div style={{ width: '64px', height: '2px', backgroundColor: '#8B1A2E', marginBottom: '16px', alignSelf: 'flex-right' }} />
-          <div className="font-heading font-black text-5xl lg:text-6xl text-brand leading-none mb-4 tracking-tight" style={{ width: '100%', textAlign: 'right' }}>
-            MELY<span className="text-accent">•</span>IMA
-          </div>
-          <p className="text-muted font-body text-2xl mb-8" style={{ width: '100%', textAlign: 'right' }}>
-            عباءات مصممة بعناية للمرأة الجزائرية العصرية
-          </p>
-          <div style={{ width: '100%', display: 'flex', justifyContent: 'flex-right' }}>
-            <a href="#products">
-              <Button size="lg">تسوقي الآن</Button>
-            </a>
-          </div>
+    <section className="relative w-full min-h-screen flex flex-col items-center justify-center text-center px-6" style={{ backgroundColor: '#F5EDD9' }}>
+      <div className="flex flex-col items-center gap-6 max-w-2xl mx-auto">
+        <img src="/logo.png" alt="MELY•IMA" className="h-40 w-70 object-contain" />
+        <h1 className="font-heading font-black text-5xl lg:text-7xl text-brand tracking-tight leading-none">
+          MELY<span className="text-accent">•</span>IMA
+        </h1>
+        <p className="font-body text-muted text-lg lg:text-xl max-w-md leading-relaxed">
+          عباءات مصممة بعناية للمرأة الجزائرية العصرية
+        </p>
+        <div className="w-16 h-0.5 bg-accent" />
+        <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+          <a href="#products" className="w-full sm:w-auto">
+            <button className="w-full sm:w-auto px-8 py-4 rounded-full font-heading font-black text-base text-white transition-all duration-200 hover:opacity-90" style={{ backgroundColor: '#8B1A2E' }}>
+              تسوقي الآن
+            </button>
+          </a>
+          <a href="#products" className="w-full sm:w-auto">
+            <button className="w-full sm:w-auto px-8 py-4 rounded-full font-heading font-black text-base transition-all duration-200" style={{ backgroundColor: 'transparent', color: '#1a1a1a', border: '2px solid #1a1a1a' }}>
+لماذا نحن         
+  </button>
+          </a>
         </div>
       </div>
-
+      {/* <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 animate-bounce">
+        <div className="w-0.5 h-8 bg-brand/30 rounded-full" />
+      </div> */}
     </section>
   )
 }
