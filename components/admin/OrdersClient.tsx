@@ -179,6 +179,9 @@ export default function OrdersClient({ initialOrders }: Props) {
                   </td>
                   <td className="px-4 py-3 font-body text-sm text-brand">
                     {order.wilaya_name ?? order.wilaya}
+                    {order.commune && (
+                      <span className="block text-xs text-muted">{order.commune}</span>
+                    )}
                   </td>
                   <td className="px-4 py-3 font-body text-xs text-muted">
                     {order.order_items?.length ?? 0} قطعة
@@ -261,6 +264,12 @@ export default function OrdersClient({ initialOrders }: Props) {
                               {order.delivery_type === 'home' ? 'توصيل للمنزل' : 'استلام من المكتب'}
                             </span>
                           </div>
+                          {order.commune && (
+                            <div className="flex items-center gap-2">
+                              <span className="text-xs text-muted font-body">البلدية:</span>
+                              <span className="text-xs font-heading font-bold text-brand">{order.commune}</span>
+                            </div>
+                          )}
                           {order.address && (
                             <div className="flex items-center gap-2">
                               <span className="text-xs text-muted font-body">العنوان:</span>
@@ -315,7 +324,7 @@ export default function OrdersClient({ initialOrders }: Props) {
               </span>
             </div>
             <div className="flex items-center gap-4 text-xs text-muted font-body">
-              <span>{order.wilaya_name ?? order.wilaya}</span>
+              <span>{order.wilaya_name ?? order.wilaya}{order.commune && ` · ${order.commune}`}</span>
               <span>·</span>
               <span>{order.order_items?.length ?? 0} قطعة</span>
               <span>·</span>

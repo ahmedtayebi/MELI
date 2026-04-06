@@ -5,6 +5,7 @@ import { Check, ChevronDown } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { useCartStore } from '@/lib/cart-store'
 import { DELIVERY_PRICES } from '@/lib/delivery-prices'
+import { getCommunesByWilaya } from '@/lib/communes'
 import Input from '@/components/ui/Input'
 import Select from '@/components/ui/Select'
 import Button from '@/components/ui/Button'
@@ -23,6 +24,7 @@ export default function OrderForm({ onSuccess }: OrderFormProps) {
     phone: '',
     phone2: '',
     wilaya: '',
+    commune: '',
     delivery_type: 'home' as 'home' | 'office',
     address: '',
     notes: '',
@@ -56,6 +58,9 @@ export default function OrderForm({ onSuccess }: OrderFormProps) {
       if (!/^0[567]\d{8}$/.test(phone2)) next.phone2 = 'رقم غير صحيح'
     }
     if (!formData.wilaya) next.wilaya = 'يرجى اختيار الولاية'
+    if (formData.delivery_type === 'home' && formData.wilaya && !formData.commune) {
+      next.commune = 'يرجى اختيار البلدية'
+    }
     if (formData.delivery_type === 'home' && !formData.address.trim()) {
       next.address = 'العنوان مطلوب للتوصيل للمنزل'
     }
@@ -84,6 +89,7 @@ export default function OrderForm({ onSuccess }: OrderFormProps) {
           products_total: productsTotal,
           total_price: totalPrice,
           address: formData.delivery_type === 'home' ? formData.address.trim() : null,
+          commune: formData.commune || null,
           notes: formData.notes.trim() || null,
           items,
         }),
@@ -205,10 +211,11 @@ export default function OrderForm({ onSuccess }: OrderFormProps) {
         options={DELIVERY_PRICES.map(w => ({ value: w.code, label: `${w.code} - ${w.name}` }))}
         placeholder="اختاري الولاية"
         value={formData.wilaya}
-        onChange={e => setFormData(d => ({ ...d, wilaya: e.target.value }))}
+        onChange={e => setFormData(d => ({ ...d, wilaya: e.target.value, commune: '' }))}
         error={errors.wilaya}
       />
 
+      
       {/* Delivery type — only after wilaya selected */}
       {formData.wilaya && (
         <div>
@@ -239,6 +246,27 @@ export default function OrderForm({ onSuccess }: OrderFormProps) {
               </button>
             ))}
           </div>
+        </div>
+      )}
+{/* Commune — only for home delivery after wilaya selected */}
+      {formData.delivery_type === 'home' && formData.wilaya && (
+        <div>
+          <label className="block font-heading font-bold text-sm text-brand mb-2 text-right">
+            البلدية
+          </label>
+          <select
+            value={formData.commune}
+            onChange={e => setFormData(d => ({ ...d, commune: e.target.value }))}
+            className="w-full bg-white border border-border rounded-xl px-4 py-3 text-sm text-brand focus:outline-none focus:border-brand focus:ring-2 focus:ring-brand/10 text-right"
+          >
+            <option value="">اختاري البلدية</option>
+            {getCommunesByWilaya(formData.wilaya).map(commune => (
+              <option key={commune} value={commune}>{commune}</option>
+            ))}
+          </select>
+          {errors.commune && (
+            <p className="text-xs text-red-500 mt-1 text-right">{errors.commune}</p>
+          )}
         </div>
       )}
 

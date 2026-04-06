@@ -52,6 +52,7 @@ export interface Order {
   phone2: string | null
   wilaya: string
   wilaya_name: string | null
+  commune: string | null
   delivery_type: 'home' | 'office'
   delivery_price: number
   products_total: number

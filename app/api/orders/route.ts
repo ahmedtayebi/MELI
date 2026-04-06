@@ -6,7 +6,7 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
     const {
-      customer_name, phone, phone2, wilaya, wilaya_name,
+      customer_name, phone, phone2, wilaya, wilaya_name, commune,
       delivery_type, delivery_price, products_total, total_price,
       address, notes, items,
     } = body
@@ -51,6 +51,7 @@ export async function POST(req: NextRequest) {
         products_total: Number(products_total),
         total_price: Number(total_price),
         address: address ? String(address).trim() : null,
+        commune: commune ? String(commune) : null,
         notes: notes ? String(notes).trim() : null,
         status: 'pending',
       })
