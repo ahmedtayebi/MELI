@@ -1,10 +1,16 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import { Bell, BellOff } from 'lucide-react'
 import { usePushNotifications } from '@/lib/use-push-notifications'
 
 export default function NotificationToggle() {
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => setMounted(true), [])
+
   const { permission, subscribed, loading, subscribe, unsubscribe } = usePushNotifications()
+
+  if (!mounted) return null
 
   if (permission === 'denied') {
     return (
