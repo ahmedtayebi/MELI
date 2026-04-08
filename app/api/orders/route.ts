@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
-import { sendPushNotification } from '@/lib/send-push-notification'
 
 export async function POST(req: NextRequest) {
   try {
@@ -90,14 +89,6 @@ export async function POST(req: NextRequest) {
         { status: 500 }
       )
     }
-
-    // Send push notification (await before returning)
-    await sendPushNotification({
-      customer_name: String(customer_name).trim(),
-      wilaya_name: String(wilaya_name ?? wilaya),
-      total_price: Number(total_price),
-      items_count: (items as any[]).reduce((sum, i) => sum + Number(i.quantity), 0),
-    }).catch(err => console.error('Push notification error:', err))
 
     return NextResponse.json({ success: true, order_id: order.id })
   } catch (err) {
