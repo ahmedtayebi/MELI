@@ -136,7 +136,7 @@ function HeroSection() {
   return (
     <section className="relative w-full min-h-screen flex flex-col items-center justify-center text-center px-6" style={{ backgroundColor: '#F5EDD9' }}>
       <div className="flex flex-col items-center gap-6 max-w-2xl mx-auto">
-        <img src="/logo.png" alt="MELY•IMA" className="h-40 w-70 object-contain" />
+        <img src="/logo.png" alt="MELY•IMA" className="h-100 w-100 object-contain" />
         <h1 className="font-heading font-black text-5xl lg:text-7xl text-brand tracking-tight leading-none">
           MELY<span className="text-accent">•</span>IMA
         </h1>
