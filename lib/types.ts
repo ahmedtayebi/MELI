@@ -10,6 +10,7 @@ export interface Product {
   id: string
   name: string
   price: number
+  original_price: number
   description: string | null
   is_visible: boolean
   category_id: string | null

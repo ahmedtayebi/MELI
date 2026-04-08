@@ -24,6 +24,8 @@
 html {
   direction: rtl;
   scroll-behavior: smooth;
+  scroll-padding-top: 108px;
+
 }
 
 body {

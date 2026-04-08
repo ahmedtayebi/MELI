@@ -4,6 +4,7 @@ import { useState, useCallback } from 'react'
 import Link from 'next/link'
 import { ChevronRight, ChevronLeft, ShoppingBag, Check } from 'lucide-react'
 import { useCartStore } from '@/lib/cart-store'
+import { getDiscountPercent, hasDiscount } from '@/lib/discount'
 import Modal from '@/components/ui/Modal'
 import OrderForm from './OrderForm'
 import type { Product } from '@/lib/types'
@@ -188,9 +189,28 @@ export default function ProductDetail({ product, storePolicy }: { product: Produ
               <h1 className="font-heading font-black text-2xl lg:text-3xl text-brand text-right mb-3">
                 {product.name}
               </h1>
-              <p className="font-heading font-black text-2xl text-accent text-right">
-                {product.price.toLocaleString('ar-DZ')} دج
-              </p>
+              {hasDiscount(product.price, product.original_price) ? (
+                <div className="flex flex-col items-end gap-1">
+                  <div className="flex items-center gap-3">
+                    <span
+                      className="font-heading font-black text-xs text-white px-2.5 py-1 rounded-full"
+                      style={{ backgroundColor: '#8B1A2E' }}
+                    >
+                      -{getDiscountPercent(product.price, product.original_price)}% تخفيض
+                    </span>
+                    <span className="font-body text-sm text-muted line-through">
+                      {product.original_price.toLocaleString('ar-DZ')} دج
+                    </span>
+                  </div>
+                  <p className="font-heading font-black text-3xl text-accent text-right">
+                    {product.price.toLocaleString('ar-DZ')} دج
+                  </p>
+                </div>
+              ) : (
+                <p className="font-heading font-black text-2xl text-accent text-right">
+                  {product.price.toLocaleString('ar-DZ')} دج
+                </p>
+              )}
             </div>
 
             {/* Colors */}

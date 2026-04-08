@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { useCartStore } from '@/lib/cart-store'
+import { getDiscountPercent, hasDiscount } from '@/lib/discount'
 import type { Product } from '@/lib/types'
 
 export default function ProductCard({ product }: { product: Product }) {
@@ -59,22 +60,20 @@ export default function ProductCard({ product }: { product: Product }) {
           </div>
         )}
         {(() => {
+          const isOnSale = hasDiscount(product.price, product.original_price)
+          const discountPercent = getDiscountPercent(product.price, product.original_price)
           const isNew = new Date(product.created_at) > new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
-          const isBestSeller = product.sales_count > 0
-          return (
-            <>
-              {isNew && (
-                <span className="absolute top-2 right-2 bg-brand text-white text-[10px] font-heading font-bold px-2 py-0.5 rounded-full z-10">
-                  جديد
-                </span>
-              )}
-              {isBestSeller && !isNew && (
-                <span className="absolute top-2 right-2 bg-accent text-white text-[10px] font-heading font-bold px-2 py-0.5 rounded-full z-10">
-                  الأكثر مبيعاً
-                </span>
-              )}
-            </>
+          if (isOnSale) return (
+            <span className="absolute top-2 right-2 z-10 font-heading font-black text-[11px] text-white px-2 py-0.5 rounded-full" style={{ backgroundColor: '#8B1A2E' }}>
+              -{discountPercent}%
+            </span>
           )
+          if (isNew) return (
+            <span className="absolute top-2 right-2 z-10 font-heading font-black text-[11px] text-white px-2 py-0.5 rounded-full" style={{ backgroundColor: '#1a1a1a' }}>
+              جديد
+            </span>
+          )
+          return null
         })()}
       </Link>
 
@@ -138,9 +137,20 @@ export default function ProductCard({ product }: { product: Product }) {
 
         {/* BOTTOM: price + button */}
         <div className="flex flex-row-reverse items-center justify-between gap-2 mt-2">
-          <p className="font-heading font-black text-base text-accent whitespace-nowrap">
-            {product.price.toLocaleString('ar-DZ')} دج
-          </p>
+          {hasDiscount(product.price, product.original_price) ? (
+            <div className="flex flex-col items-end">
+              <span className="font-heading font-black text-base text-accent whitespace-nowrap leading-tight">
+                {product.price.toLocaleString('ar-DZ')} دج
+              </span>
+              <span className="font-body text-[11px] text-muted line-through whitespace-nowrap leading-tight">
+                {product.original_price.toLocaleString('ar-DZ')} دج
+              </span>
+            </div>
+          ) : (
+            <p className="font-heading font-black text-base text-accent whitespace-nowrap">
+              {product.price.toLocaleString('ar-DZ')} دج
+            </p>
+          )}
 
           <button
             type="button"
