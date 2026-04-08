@@ -15,7 +15,7 @@ export default async function ProductPage({ params }: Props) {
     supabase
       .from('products')
       .select(`
-        id, name, price, description, is_visible, category_id, created_at, updated_at,
+        id, name, price, original_price, description, is_visible, category_id, created_at, updated_at,
         product_colors(
           id, product_id, name, hex_code, image_url, is_visible,
           product_color_images(id, color_id, image_url, sort_order)
@@ -39,6 +39,7 @@ export default async function ProductPage({ params }: Props) {
   const product: Product = {
     ...data,
     description: data.description ?? null,
+    original_price: (data as any).original_price ?? 0,
     sales_count: (data as any).sales_count ?? 0,
     product_colors: (data.product_colors ?? [])
       .filter((c: any) => c.is_visible)

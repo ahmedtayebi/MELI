@@ -1,20 +1,20 @@
-'use client'
+import { createClient } from '@/lib/supabase/server'
+import StoreLayoutClient from '@/components/store/StoreLayoutClient'
+import type { Category } from '@/lib/types'
 
-import { useState } from 'react'
-import Header from '@/components/layout/Header'
-import Footer from '@/components/layout/Footer'
-import dynamic from 'next/dynamic'
-const CartDrawer = dynamic(() => import('@/components/store/CartDrawer'), { ssr: false })
+export default async function StoreLayout({ children }: { children: React.ReactNode }) {
+  const supabase = await createClient()
+  const { data } = await supabase
+    .from('categories')
+    .select('id, name, sort_order, is_visible, created_at')
+    .eq('is_visible', true)
+    .order('sort_order', { ascending: true })
 
-export default function StoreLayout({ children }: { children: React.ReactNode }) {
-  const [cartOpen, setCartOpen] = useState(false)
+  const categories = (data ?? []) as Category[]
 
   return (
-    <div className="min-h-screen flex flex-col bg-surface">
-      <Header onCartClick={() => setCartOpen(true)} />
-      <div className="flex-1">{children}</div>
-      <Footer />
-      <CartDrawer isOpen={cartOpen} onClose={() => setCartOpen(false)} />
-    </div>
+    <StoreLayoutClient categories={categories}>
+      {children}
+    </StoreLayoutClient>
   )
 }

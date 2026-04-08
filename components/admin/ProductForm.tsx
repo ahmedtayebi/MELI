@@ -97,6 +97,7 @@ export default function ProductForm({ productId, initialData, categories = [] }:
   const [name, setName] = useState(initialData?.name ?? '')
   const [description, setDescription] = useState(initialData?.description ?? '')
   const [price, setPrice] = useState<string>(initialData?.price !== undefined ? String(initialData.price) : '')
+  const [originalPrice, setOriginalPrice] = useState<string>(initialData?.original_price ? String(initialData.original_price) : '')
   const [isVisible, setIsVisible] = useState(initialData?.is_visible ?? true)
   const [categoryId, setCategoryId] = useState<string>(initialData?.category_id ?? '')
   const [colors, setColors] = useState<ColorEntry[]>(buildInitialColors(initialData))
@@ -246,6 +247,7 @@ export default function ProductForm({ productId, initialData, categories = [] }:
           id: productId,
           name: name.trim(),
           price: priceNum,
+          original_price: Number(originalPrice) || 0,
           description: description.trim() || null,
           is_visible: isVisible,
           category_id: categoryId || null,
@@ -428,6 +430,26 @@ export default function ProductForm({ productId, initialData, categories = [] }:
           className="w-full border border-border rounded-xl px-4 py-2.5 text-sm text-brand placeholder:text-muted focus:outline-none focus:border-brand focus:ring-2 focus:ring-brand/10 font-body"
           dir="ltr"
         />
+        <div>
+          <label className="block font-heading font-bold text-sm text-brand mb-2 text-right">
+            السعر الأصلي قبل التخفيض <span className="text-muted font-body font-normal">(اتركه 0 إذا لا يوجد تخفيض)</span>
+          </label>
+          <input
+            type="number"
+            min={0}
+            step={1}
+            value={originalPrice}
+            onChange={e => setOriginalPrice(e.target.value)}
+            placeholder="مثال: 7000"
+            className="w-full border border-border rounded-xl px-4 py-2.5 text-sm text-brand placeholder:text-muted focus:outline-none focus:border-brand focus:ring-2 focus:ring-brand/10 font-body"
+            dir="ltr"
+          />
+          {Number(originalPrice) > 0 && Number(price) > 0 && Number(originalPrice) > Number(price) && (
+            <p className="text-xs text-green-600 mt-1 text-right font-body">
+              نسبة التخفيض: {Math.round(((Number(originalPrice) - Number(price)) / Number(originalPrice)) * 100)}%
+            </p>
+          )}
+        </div>
       </section>
 
       {/* Category */}
