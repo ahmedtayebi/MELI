@@ -22,7 +22,7 @@ export default function StoreLayoutClient({
   const [cartOpen, setCartOpen] = useState(false)
 
   return (
-    <div className="min-h-screen flex flex-col bg-surface">
+    <div className="min-h-screen flex flex-col" style={{ background: '#FFFDF9' }}>
       <Header onCartClick={() => setCartOpen(true)} />
       <CategoryBar categories={categories} />
       <div className="flex-1">{children}</div>

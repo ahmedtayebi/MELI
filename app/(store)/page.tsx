@@ -2,7 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import ProductsSection from '@/components/store/ProductsSection'
 import BestSellersSection from '@/components/store/BestSellersSection'
 import ReviewsSection from '@/components/store/ReviewsSection'
-import Button from '@/components/ui/Button'
+import HeroSection from '@/components/store/HeroSection'
 import type { Product, Category, Review } from '@/lib/types'
 
 const PRODUCTS_SELECT = `
@@ -87,80 +87,112 @@ export default async function StorePage() {
 }
 
 // ─────────────────────────────────────────────────────────
-// Statement
+// Statement Section
 // ─────────────────────────────────────────────────────────
 
 function StatementSection() {
-  return (
-    <section id="statement" className="bg-brand py-24 px-6 text-center">
-      <div className="max-w-2xl mx-auto flex flex-col items-center gap-8">
+  const stats = [
+    { number: '100%', label: 'جودة مضمونة' },
+    { number: 'يومي', label: 'توصيل لكل الولايات' },
+    { number: '24/7', label: 'خدمة العملاء' },
+  ]
 
+  return (
+    <section
+      id="statement"
+      className="relative py-28 px-6 text-center overflow-hidden"
+      style={{ background: 'linear-gradient(145deg, #0E0B09 0%, #1C1108 50%, #0E0B09 100%)' }}
+    >
+      {/* Decorative orb */}
+      <div
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full pointer-events-none"
+        style={{
+          background: 'radial-gradient(circle, rgba(200,150,60,0.07) 0%, transparent 70%)',
+          filter: 'blur(40px)',
+        }}
+      />
+
+      {/* Grid overlay */}
+      <div
+        className="absolute inset-0 pointer-events-none opacity-[0.025]"
+        style={{
+          backgroundImage: `
+            linear-gradient(rgba(200,150,60,1) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(200,150,60,1) 1px, transparent 1px)
+          `,
+          backgroundSize: '60px 60px',
+        }}
+      />
+
+      <div className="relative z-10 max-w-2xl mx-auto flex flex-col items-center gap-10">
+
+        {/* Eyebrow */}
+        <div className="flex items-center gap-3">
+          <div className="h-px w-8 bg-gradient-to-r from-transparent to-amber-500/60" />
+          <span className="font-heading font-bold text-xs tracking-widest uppercase" style={{ color: '#C8963C' }}>
+            رؤيتنا
+          </span>
+          <div className="h-px w-8 bg-gradient-to-l from-transparent to-amber-500/60" />
+        </div>
+
+        {/* Headline */}
         <h2 className="font-heading font-black text-4xl sm:text-5xl text-white leading-tight">
           نحن لا نبيع عباءة
           <br />
-          نبيع <span className="text-accent">ثقتكِ</span> بنفسك
+          نبيع{' '}
+          <span
+            style={{
+              background: 'linear-gradient(135deg, #C8963C, #F0C060, #C8963C)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+            }}
+          >
+            ثقتكِ
+          </span>{' '}
+          بنفسك
         </h2>
 
-        <div className="w-16 h-0.5 bg-accent" />
-
-        <p className="font-body text-white/60 text-lg italic leading-relaxed max-w-md">
+        <p className="font-body text-white/50 text-base leading-relaxed max-w-md">
           كل عباءة مصممة بعناية لتعكس أناقتك اليومية وتمنحكِ الراحة طوال اليوم
         </p>
 
-        <div className="grid grid-cols-3 gap-6 w-full mt-4">
-          {[
-            { number: '100%', label: 'جودة مضمونة' },
-            { number: 'يومي', label: 'توصيل لكل الولايات' },
-            { number: '24/7', label: 'خدمة العملاء' },
-          ].map(({ number, label }) => (
-            <div key={label} className="flex flex-col items-center gap-2">
-              <span className="font-heading font-black text-2xl sm:text-3xl text-accent">
+        {/* Stats */}
+        <div className="grid grid-cols-3 gap-4 w-full mt-2">
+          {stats.map(({ number, label }) => (
+            <div
+              key={label}
+              className="flex flex-col items-center gap-2 py-6 px-3 rounded-2xl"
+              style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(200,150,60,0.14)' }}
+            >
+              <span
+                className="font-heading font-black text-2xl sm:text-3xl"
+                style={{
+                  background: 'linear-gradient(135deg, #C8963C, #F0C060)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text',
+                }}
+              >
                 {number}
               </span>
-              <span className="font-body text-white/50 text-xs sm:text-sm text-center">
+              <span className="font-body text-white/45 text-xs sm:text-sm text-center leading-snug">
                 {label}
               </span>
             </div>
           ))}
         </div>
 
-      </div>
-    </section>
-  )
-}
+        {/* CTA */}
+        <a
+          href="#products"
+          className="mt-2 px-8 py-4 rounded-full font-heading font-black text-sm text-[#0E0B09]"
+          style={{ background: 'linear-gradient(135deg, #C8963C, #F0C060)' }}
+        >
+          اكتشفي التشكيلة
+        </a>
 
-// ─────────────────────────────────────────────────────────
-// Hero
-// ─────────────────────────────────────────────────────────
-
-function HeroSection() {
-  return (
-    <section className="relative w-full min-h-screen flex flex-col items-center justify-center text-center px-6" style={{ backgroundColor: '#F5EDD9' }}>
-      <div className="flex flex-col items-center gap-6 max-w-2xl mx-auto">
-        <img src="/logo.png" alt="MELY•IMA" className="h-100 w-100 object-contain" />
-        <h1 className="font-heading font-black text-5xl lg:text-7xl text-brand tracking-tight leading-none">
-          MELY<span className="text-accent">•</span>IMA
-        </h1>
-        <p className="font-body text-muted text-lg lg:text-xl max-w-md leading-relaxed">
-          عباءات مصممة بعناية للمرأة الجزائرية العصرية
-        </p>
-        <div className="w-16 h-0.5 bg-accent" />
-        <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
-          <a href="#products" className="w-full sm:w-auto">
-            <button className="w-full sm:w-auto px-8 py-4 rounded-full font-heading font-black text-base text-white transition-all duration-200 hover:opacity-90" style={{ backgroundColor: '#8B1A2E' }}>
-              تسوقي الآن
-            </button>
-          </a>
-          <a href="#products" className="w-full sm:w-auto">
-            <button className="w-full sm:w-auto px-8 py-4 rounded-full font-heading font-black text-base transition-all duration-200" style={{ backgroundColor: 'transparent', color: '#1a1a1a', border: '2px solid #1a1a1a' }}>
-لماذا نحن         
-  </button>
-          </a>
-        </div>
       </div>
-      {/* <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 animate-bounce">
-        <div className="w-0.5 h-8 bg-brand/30 rounded-full" />
-      </div> */}
     </section>
   )
 }
