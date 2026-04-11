@@ -8,27 +8,32 @@ import type { Category } from '@/lib/types'
 const SPECIAL_LINKS = [
   { label: 'التخفيضات',     href: '/discounts',    Icon: Percent,    hot: true  },
   { label: 'الأكثر مبيعاً', href: '/best-sellers', Icon: TrendingUp, hot: false },
-  { label: 'الجديد',         href: '/new-arrivals',  Icon: Sparkles,  hot: false },
+  { label: 'الجديد',         href: '/new-arrivals',  Icon: Sparkles,   hot: false },
 ]
 
 export default function CategoryBar({ categories }: { categories: Category[] }) {
   const pathname = usePathname()
 
   return (
+    /*
+      Header outer wrapper height: pt-3 (12px) + h-14 inner (56px) = 68px total.
+      CategoryBar top must be 68px to sit flush below the floating pill.
+    */
     <nav
-      className="sticky top-16 z-40 overflow-x-auto"
+      className="sticky z-40 overflow-x-auto"
       style={{
-        background: 'rgba(14,11,9,0.92)',
-        backdropFilter: 'blur(16px)',
-        WebkitBackdropFilter: 'blur(16px)',
-        borderBottom: '1px solid rgba(200,150,60,0.14)',
+        top: '68px',
+        background: 'rgba(255,251,244,0.94)',
+        backdropFilter: 'blur(18px)',
+        WebkitBackdropFilter: 'blur(18px)',
+        borderBottom: '1px solid rgba(232,221,208,0.85)',
         scrollbarWidth: 'none',
       }}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="flex items-center justify-between h-11 min-w-max lg:min-w-0">
 
-          {/* RIGHT — Category pills */}
+          {/* RIGHT — Categories */}
           <div className="flex items-center gap-0.5">
             <NavPill label="الكل" href="/#products" active={false} />
             {categories.map((cat) => (
@@ -55,15 +60,15 @@ export default function CategoryBar({ categories }: { categories: Category[] }) 
                              font-heading font-bold whitespace-nowrap transition-all duration-200"
                   style={{
                     color: isActive
-                      ? '#C8963C'
+                      ? '#1A1410'
                       : hot
-                        ? '#E8A840'
-                        : 'rgba(255,255,255,0.55)',
-                    backgroundColor: isActive ? 'rgba(200,150,60,0.12)' : 'transparent',
-                    border: hot && !isActive ? '1px solid rgba(200,150,60,0.35)' : 'none',
+                        ? '#B8872E'
+                        : '#7A6A58',
+                    backgroundColor: isActive ? 'rgba(26,20,16,0.06)' : 'transparent',
+                    border: hot && !isActive ? '1px solid rgba(184,135,46,0.35)' : 'none',
                   }}
                 >
-                  <Icon size={13} />
+                  <Icon size={12} />
                   {label}
                 </motion.a>
               )
@@ -84,16 +89,16 @@ function NavPill({ label, href, active }: { label: string; href: string; active:
       className="relative px-3 py-1.5 rounded-lg text-xs font-heading font-bold
                  whitespace-nowrap transition-colors duration-200"
       style={{
-        color: active ? '#C8963C' : 'rgba(255,255,255,0.55)',
-        backgroundColor: active ? 'rgba(200,150,60,0.12)' : 'transparent',
+        color: active ? '#1A1410' : '#7A6A58',
+        backgroundColor: active ? 'rgba(26,20,16,0.07)' : 'transparent',
       }}
     >
       {label}
       {active && (
         <motion.span
-          layoutId="cat-active"
-          className="absolute bottom-0 right-3 left-3 h-px rounded-full"
-          style={{ background: 'linear-gradient(90deg, transparent, #C8963C, transparent)' }}
+          layoutId="cat-bar-active"
+          className="absolute bottom-0 right-3 left-3 h-[1.5px] rounded-full"
+          style={{ background: 'linear-gradient(90deg, transparent, #B8872E, transparent)' }}
         />
       )}
     </motion.a>

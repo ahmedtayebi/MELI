@@ -101,48 +101,62 @@ function StatementSection() {
     <section
       id="statement"
       className="relative py-28 px-6 text-center overflow-hidden"
-      style={{ background: 'linear-gradient(145deg, #0E0B09 0%, #1C1108 50%, #0E0B09 100%)' }}
+      style={{ background: 'linear-gradient(165deg, #F5EBD8 0%, #EDE0CC 50%, #F0E8DA 100%)' }}
     >
-      {/* Decorative orb */}
+      {/* Decorative ambient orb */}
       <div
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full pointer-events-none"
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2
+                   w-[600px] h-[600px] rounded-full pointer-events-none"
         style={{
-          background: 'radial-gradient(circle, rgba(200,150,60,0.07) 0%, transparent 70%)',
+          background: 'radial-gradient(circle, rgba(184,135,46,0.10) 0%, transparent 70%)',
           filter: 'blur(40px)',
         }}
       />
 
-      {/* Grid overlay */}
+      {/* Watermark */}
       <div
-        className="absolute inset-0 pointer-events-none opacity-[0.025]"
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2
+                   font-heading font-black select-none pointer-events-none whitespace-nowrap"
         style={{
-          backgroundImage: `
-            linear-gradient(rgba(200,150,60,1) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(200,150,60,1) 1px, transparent 1px)
-          `,
-          backgroundSize: '60px 60px',
+          fontSize: 'clamp(70px, 14vw, 160px)',
+          color: 'rgba(184,135,46,0.05)',
+          letterSpacing: '-0.04em',
         }}
-      />
+      >
+        MELY•IMA
+      </div>
 
       <div className="relative z-10 max-w-2xl mx-auto flex flex-col items-center gap-10">
 
         {/* Eyebrow */}
         <div className="flex items-center gap-3">
-          <div className="h-px w-8 bg-gradient-to-r from-transparent to-amber-500/60" />
-          <span className="font-heading font-bold text-xs tracking-widest uppercase" style={{ color: '#C8963C' }}>
+          <div
+            className="h-px w-8"
+            style={{ background: 'linear-gradient(90deg, transparent, rgba(184,135,46,0.6))' }}
+          />
+          <span
+            className="font-heading font-bold text-xs tracking-[0.18em] uppercase"
+            style={{ color: '#B8872E' }}
+          >
             رؤيتنا
           </span>
-          <div className="h-px w-8 bg-gradient-to-l from-transparent to-amber-500/60" />
+          <div
+            className="h-px w-8"
+            style={{ background: 'linear-gradient(90deg, rgba(184,135,46,0.6), transparent)' }}
+          />
         </div>
 
         {/* Headline */}
-        <h2 className="font-heading font-black text-4xl sm:text-5xl text-white leading-tight">
+        <h2
+          className="font-heading font-black text-4xl sm:text-5xl leading-tight"
+          style={{ color: '#1A1410' }}
+        >
           نحن لا نبيع عباءة
           <br />
           نبيع{' '}
           <span
             style={{
-              background: 'linear-gradient(135deg, #C8963C, #F0C060, #C8963C)',
+              background: 'linear-gradient(140deg, #8B6420, #C8963C, #E8B850, #B8872E)',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
               backgroundClip: 'text',
@@ -153,7 +167,7 @@ function StatementSection() {
           بنفسك
         </h2>
 
-        <p className="font-body text-white/50 text-base leading-relaxed max-w-md">
+        <p className="font-body text-base leading-relaxed max-w-md" style={{ color: '#7A6A58' }}>
           كل عباءة مصممة بعناية لتعكس أناقتك اليومية وتمنحكِ الراحة طوال اليوم
         </p>
 
@@ -163,12 +177,16 @@ function StatementSection() {
             <div
               key={label}
               className="flex flex-col items-center gap-2 py-6 px-3 rounded-2xl"
-              style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(200,150,60,0.14)' }}
+              style={{
+                background: 'rgba(255,251,244,0.65)',
+                border: '1px solid rgba(232,221,208,0.9)',
+                boxShadow: '0 2px 16px rgba(26,20,16,0.05)',
+              }}
             >
               <span
                 className="font-heading font-black text-2xl sm:text-3xl"
                 style={{
-                  background: 'linear-gradient(135deg, #C8963C, #F0C060)',
+                  background: 'linear-gradient(140deg, #8B6420, #C8963C, #E8B850)',
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent',
                   backgroundClip: 'text',
@@ -176,7 +194,10 @@ function StatementSection() {
               >
                 {number}
               </span>
-              <span className="font-body text-white/45 text-xs sm:text-sm text-center leading-snug">
+              <span
+                className="font-body text-xs sm:text-sm text-center leading-snug"
+                style={{ color: '#7A6A58' }}
+              >
                 {label}
               </span>
             </div>
@@ -186,8 +207,8 @@ function StatementSection() {
         {/* CTA */}
         <a
           href="#products"
-          className="mt-2 px-8 py-4 rounded-full font-heading font-black text-sm text-[#0E0B09]"
-          style={{ background: 'linear-gradient(135deg, #C8963C, #F0C060)' }}
+          className="mt-2 px-9 py-4 rounded-xl font-heading font-black text-sm text-white"
+          style={{ background: '#1A1410' }}
         >
           اكتشفي التشكيلة
         </a>

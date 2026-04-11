@@ -18,7 +18,7 @@ export default function BestSellersSection({ products }: { products: Product[] }
       ref={ref}
       id="best"
       className="w-full py-20"
-      style={{ background: 'linear-gradient(180deg, #F9F4EE 0%, #F4EDE3 100%)' }}
+      style={{ background: 'linear-gradient(180deg, #F9F4EE 0%, #F5EBD8 100%)' }}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
 

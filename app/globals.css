@@ -1,20 +1,18 @@
 @import "tailwindcss";
 
 @theme {
-  /* ── Editorial Gold Palette ── */
-  --color-brand:    #0E0B09;   /* warm near-black */
-  --color-accent:   #C8963C;   /* rich warm gold — echoes the logo */
-  --color-accent2:  #E8B45A;   /* bright gold highlight */
-  --color-surface:  #F9F4EE;   /* warm cream section bg */
-  --color-muted:    #8A7B6C;   /* warm taupe */
-  --color-border:   #EAE0D4;   /* soft warm border */
-  --color-white:    #FFFFFF;
+  /* ── Desert Gold Editorial — MELY•IMA 2026 ── */
+  --color-brand:   #1A1410;   /* deep warm charcoal */
+  --color-accent:  #B8872E;   /* rich warm gold (AAA on white) */
+  --color-accent2: #D4A94C;   /* bright gold — decorative only */
+  --color-surface: #F5EBD8;   /* warm sand */
+  --color-muted:   #7A6A58;   /* warm taupe */
+  --color-border:  #E8DDD0;   /* soft warm border */
+  --color-white:   #FFFFFF;
 
-  /* Font families — injected by next/font/google */
   --font-heading: var(--font-noto-kufi);
   --font-body:    var(--font-dm-sans);
 
-  /* Border radii */
   --radius-sm:   8px;
   --radius-md:   14px;
   --radius-lg:   20px;
@@ -25,48 +23,60 @@
 html {
   direction: rtl;
   scroll-behavior: smooth;
-  scroll-padding-top: 108px;
+  scroll-padding-top: 120px;
 }
 
 body {
-  background: #FFFDF9;
+  background: #FFFBF4;
   margin: 0;
   padding: 0;
 }
 
-/* Custom scrollbar */
+/* ── Warm scrollbar ── */
 ::-webkit-scrollbar        { width: 5px; height: 5px; }
-::-webkit-scrollbar-track  { background: #F0EAE0; }
-::-webkit-scrollbar-thumb  { background: #C8963C55; border-radius: 9999px; }
-::-webkit-scrollbar-thumb:hover { background: #C8963C; }
+::-webkit-scrollbar-track  { background: #F0E8DA; }
+::-webkit-scrollbar-thumb  { background: rgba(184,135,46,0.3); border-radius: 9999px; }
+::-webkit-scrollbar-thumb:hover { background: #B8872E; }
 
-/* Gradient utilities used by redesigned sections */
-.hero-gradient {
-  background: linear-gradient(135deg, #0E0B09 0%, #1C1108 40%, #0E0B09 100%);
+/* ── Grain texture overlay ── */
+@keyframes grain-shift {
+  0%,100% { transform: translate(0,0); }
+  20%     { transform: translate(-2%,-3%); }
+  40%     { transform: translate(3%, 2%); }
+  60%     { transform: translate(-1%, 4%); }
+  80%     { transform: translate(2%,-2%); }
+}
+.grain-overlay::after {
+  content: '';
+  position: fixed;
+  inset: -50%;
+  width: 200%;
+  height: 200%;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  opacity: 0.022;
+  pointer-events: none;
+  animation: grain-shift 9s steps(8) infinite;
+  z-index: 9999;
 }
 
-.gold-text {
-  background: linear-gradient(135deg, #C8963C, #F0C060, #C8963C);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+/* ── Keyframe animations ── */
+@keyframes float-badge {
+  0%,100% { transform: translateY(0px); }
+  50%     { transform: translateY(-9px); }
+}
+@keyframes float-badge-2 {
+  0%,100% { transform: translateY(0px) rotate(0deg); }
+  50%     { transform: translateY(7px) rotate(1.5deg); }
+}
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+@keyframes draw-line {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
 }
 
-.gold-glow {
-  box-shadow: 0 0 20px rgba(200, 150, 60, 0.25), 0 0 60px rgba(200, 150, 60, 0.10);
-}
-
-@keyframes float-orb {
-  0%, 100% { transform: translateY(0px) scale(1); }
-  50%       { transform: translateY(-24px) scale(1.05); }
-}
-@keyframes float-orb-2 {
-  0%, 100% { transform: translateY(0px) scale(1) rotate(0deg); }
-  50%       { transform: translateY(20px) scale(0.95) rotate(10deg); }
-}
-@keyframes shimmer {
-  0%   { background-position: -200% center; }
-  100% { background-position:  200% center; }
-}
-.animate-float-orb   { animation: float-orb   8s ease-in-out infinite; }
-.animate-float-orb-2 { animation: float-orb-2 11s ease-in-out infinite; }
+.float-badge   { animation: float-badge   5s ease-in-out infinite; }
+.float-badge-2 { animation: float-badge-2 7s ease-in-out infinite; }
+.spin-slow     { animation: spin-slow 36s linear infinite; }
