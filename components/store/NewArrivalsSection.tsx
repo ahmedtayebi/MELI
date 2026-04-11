@@ -53,7 +53,7 @@ export default function NewArrivalsSection({ products }: { products: Product[] }
             className="font-heading font-black text-3xl sm:text-4xl mb-2"
             style={{ color: '#1A1410' }}
           >
-            أحدث الوصولات
+            أحدث الموديلات
           </h2>
           <p className="font-body text-sm mb-4" style={{ color: '#7A6A58' }}>
             أحدث ما أضفناه من تشكيلات عصرية
