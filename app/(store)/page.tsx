@@ -3,6 +3,8 @@ import ProductsSection from '@/components/store/ProductsSection'
 import BestSellersSection from '@/components/store/BestSellersSection'
 import ReviewsSection from '@/components/store/ReviewsSection'
 import HeroSection from '@/components/store/HeroSection'
+import NewArrivalsSection from '@/components/store/NewArrivalsSection'
+import DiscountsSection from '@/components/store/DiscountsSection'
 import type { Product, Category, Review } from '@/lib/types'
 
 const PRODUCTS_SELECT = `
@@ -45,6 +47,7 @@ export default async function StorePage() {
     { data: bestSellersData },
     { data: categoriesData },
     { data: reviewsData },
+    { data: discountsData },
   ] = await Promise.all([
     supabase
       .from('products')
@@ -56,6 +59,7 @@ export default async function StorePage() {
       .select(PRODUCTS_SELECT)
       .eq('is_visible', true)
       .order('sales_count', { ascending: false })
+      .gt('sales_count', 0)
       .limit(6),
     supabase
       .from('categories')
@@ -68,18 +72,31 @@ export default async function StorePage() {
       .eq('status', 'approved')
       .order('created_at', { ascending: false })
       .limit(20),
+    supabase
+      .from('products')
+      .select(PRODUCTS_SELECT)
+      .eq('is_visible', true)
+      .gt('original_price', 0)
+      .order('created_at', { ascending: false })
+      .limit(20),
   ])
 
   const products: Product[] = (productsData ?? []).map(mapProduct)
   const bestSellers: Product[] = (bestSellersData ?? []).map(mapProduct)
   const categories: Category[] = (categoriesData ?? []) as Category[]
   const reviews: Review[] = (reviewsData ?? []) as Review[]
+  const discounts: Product[] = (discountsData ?? [])
+    .map(mapProduct)
+    .filter(p => p.original_price > p.price)
+    .slice(0, 6)
 
   return (
     <main className="pointer-events-auto">
       <HeroSection />
       <ReviewsSection reviews={reviews} />
       <BestSellersSection products={bestSellers} />
+      <DiscountsSection products={discounts} />
+      <NewArrivalsSection products={products.slice(0, 6)} />
       <ProductsSection products={products} categories={categories} />
       <StatementSection />
     </main>

@@ -41,9 +41,10 @@ export default async function BestSellersPage() {
     .from('products')
     .select(PRODUCTS_SELECT)
     .eq('is_visible', true)
+    .gt('sales_count', 0)
     .order('sales_count', { ascending: false })
-    .limit(24)
-
+    .limit(6)
+    
   const products = (data ?? []).map(mapProduct)
 
   return (
