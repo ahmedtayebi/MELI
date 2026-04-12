@@ -94,9 +94,9 @@ export default async function StorePage() {
     <main className="pointer-events-auto">
       <HeroSection />
       <ReviewsSection reviews={reviews} />
+      <NewArrivalsSection products={products.slice(0, 6)} />
       <BestSellersSection products={bestSellers} />
       <DiscountsSection products={discounts} />
-      <NewArrivalsSection products={products.slice(0, 6)} />
       <ProductsSection products={products} categories={categories} />
       <StatementSection />
     </main>
