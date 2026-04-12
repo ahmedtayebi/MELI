@@ -103,9 +103,6 @@ export default async function StorePage() {
   )
 }
 
-// ─────────────────────────────────────────────────────────
-// Statement Section
-// ─────────────────────────────────────────────────────────
 
 function StatementSection() {
   const stats = [
